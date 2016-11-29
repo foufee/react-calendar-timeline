@@ -23,7 +23,44 @@
       border-color: #29B31A;
     }
   </style>
+
+  <div class="draggable">A New Group</div>
   <script>
+    function dragMoveListener (event) {
+      var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+      // translate the element
+      target.style.webkitTransform =
+        target.style.transform =
+          'translate(' + x + 'px, ' + y + 'px)';
+
+      // update the posiion attributes
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+    }
+
+    interact('.draggable')
+      .draggable({
+        // enable inertial throwing
+        inertia: true,
+        // keep the element within the area of it's parent
+        restrict: {
+          restriction: "parent",
+          endOnly: true,
+          elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+        },
+        autoScroll: true,
+        onmove: dragMoveListener,
+      })
+    ;
+  </script>
+
+  <script>
+
+
     GROUP_COUNT = 30
     ITEM_COUNT = 1000
     DAYS_IN_PAST = 30
@@ -32,7 +69,9 @@
     for (var i = 0; i < GROUP_COUNT; i++) {
       groups.push({
         id: (i+1)+'',
-        title: faker.name.firstName()
+        title: faker.name.firstName(),
+        canSelect: Math.random() >= 0.5,
+        dropTarget: Math.random() >= 0.5,
       })
     };
 
@@ -70,6 +109,7 @@
       canMove: true, // defaults
       canResize: 'right',
       canSelect: true,
+      canSelectGroups: false,
 
       itemsSorted: true,
       itemTouchSendsClick: false,
@@ -112,6 +152,15 @@
 
       onItemResize: function (item, time, edge) {
         console.log("Resized", item, time, edge);
+      },
+      onGroupContextMenu: function (group) {
+        console.log("Group Context menu", group);
+      },
+      onGroupDrop: function (group) {
+        console.log("Group drop", group);
+      },
+      onGroupSelect: function (group) {
+        console.log("Group select", group);
       },
 
       moveResizeValidator: function(action, item, time, resizeEdge) {

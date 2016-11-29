@@ -1,10 +1,20 @@
 import React, { Component } from 'react'
-
+import interact from 'interact.js'
 import { _get, arraysEqual } from '../utils'
+import Group from './Group'
 
 export default class Sidebar extends Component {
+  static propTypes = {
+    //canSelect: PropTypes.bool,
+  }
+
+
+  static defaultProps = {
+  }
+
   constructor (props) {
     super(props)
+
     this.state = {
       scrollTop: 0,
       componentTop: 0
@@ -23,6 +33,7 @@ export default class Sidebar extends Component {
              nextProps.fixedHeader === this.props.fixedHeader &&
              nextProps.zIndex === this.props.zIndex &&
              nextProps.groupHeights === this.props.groupHeights &&
+             nextProps.groups === this.props.groups &&
              nextProps.height === this.props.height)
   }
 
@@ -115,11 +126,17 @@ export default class Sidebar extends Component {
         height: `${groupHeights[index] - 1}px`,
         lineHeight: `${groupHeights[index] - 1}px`
       }
-
       groupLines.push(
-        <div key={_get(group, groupIdKey)} className={'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd')} style={elementStyle}>
-          {_get(group, groupTitleKey)}
-        </div>
+        <Group
+          keys={this.props.keys}
+          key={ "sideBar" + _get(group, groupIdKey)}
+          className={'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd') + (_get(group, "dropTarget") ? ' rct-sidebar-droptarget' : ' ')}
+          style={elementStyle}
+          onDrop={this.props.onGroupDrop}
+          onContextMenu={this.props.onGroupContextMenu}
+          onSelect={this.props.onSelect}
+          canSelect={_get(group, 'canSelect') !== undefined ? _get(group, 'canSelect') : this.props.canSelect}
+          group={group}/>
       )
       i += 1
     })

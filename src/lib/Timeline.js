@@ -57,12 +57,14 @@ export default class ReactCalendarTimeline extends Component {
     canResize: PropTypes.oneOf([true, false, 'left', 'right', 'both']),
     useResizeHandle: PropTypes.bool,
     canSelect: PropTypes.bool,
+    canSelectGroups: PropTypes.bool,
 
     stackItems: PropTypes.bool,
 
     traditionalZoom: PropTypes.bool,
 
     itemTouchSendsClick: PropTypes.bool,
+    groupTouchSendsClick: PropTypes.bool,
 
     onItemMove: PropTypes.func,
     onItemResize: PropTypes.func,
@@ -72,6 +74,11 @@ export default class ReactCalendarTimeline extends Component {
     onItemDoubleClick: PropTypes.func,
     onItemContextMenu: PropTypes.func,
     onCanvasDoubleClick: PropTypes.func,
+
+    onGroupClick: PropTypes.func,
+    onGroupSelect: PropTypes.func,
+    onGroupDrop: PropTypes.func,
+    onGroupContextMenu: PropTypes.func,
 
     moveResizeValidator: PropTypes.func,
 
@@ -116,6 +123,7 @@ export default class ReactCalendarTimeline extends Component {
     canResize: 'right',
     useResizeHandle: false,
     canSelect: true,
+    canSelectGroups: false,
 
     stackItems: false,
 
@@ -129,6 +137,11 @@ export default class ReactCalendarTimeline extends Component {
     onItemDoubleClick: null,
     onItemContextMenu: null,
 
+    onGropuClick: null,
+    onGroupSelect: null,
+    onGroupDrop: null,
+    onGroupContextMenu: null,
+
     moveResizeValidator: null,
 
     dayBackground: null,
@@ -137,6 +150,7 @@ export default class ReactCalendarTimeline extends Component {
     defaultTimeEnd: null,
 
     itemTouchSendsClick: false,
+    groupTouchSendsClick: false,
 
     style: {},
     keys: defaultKeys,
@@ -190,6 +204,7 @@ export default class ReactCalendarTimeline extends Component {
       canvasTimeStart: visibleTimeStart - (visibleTimeEnd - visibleTimeStart),
 
       selectedItem: null,
+      selectedGroup: null,
       dragTime: null,
       dragGroupTitle: null,
       resizeTime: null,
@@ -525,6 +540,19 @@ export default class ReactCalendarTimeline extends Component {
     }
   }
 
+  selectGroup = (group, clickType, e) => {
+    if (this.state.selectedGroup === group || (this.props.groupTouchSendsClick && clickType === 'touch')) {
+      if (group && this.props.onGroupClick) {
+        this.props.onGroupClick(item, e)
+      }
+    } else {
+      this.setState({selectedGroup: group})
+      if (group && this.props.onGroupSelect) {
+        this.props.onGroupSelect(group, e)
+      }
+    }
+  }
+
   rowAndTimeFromEvent (e) {
     const { lineHeight, dragSnap } = this.props
     const { width, visibleTimeStart, visibleTimeEnd } = this.state
@@ -552,6 +580,11 @@ export default class ReactCalendarTimeline extends Component {
           const groupId = _get(this.props.groups[row], this.props.keys.groupIdKey)
           this.props.onCanvasClick(groupId, time, e)
         }
+      }
+    }
+    if (!hasSomeParentTheClass(e.target, 'rct-sidebar')) {
+      if (this.state.selectedGroup) {
+        this.selectGroup(null)
       }
     }
   }
@@ -674,6 +707,7 @@ export default class ReactCalendarTimeline extends Component {
              groups={this.props.groups}
              keys={this.props.keys}
              selectedItem={this.state.selectedItem}
+             selectedGroup={this.state.selectedGroup}
              dragSnap={this.props.dragSnap}
              minResizeWidth={this.props.minResizeWidth}
              canChangeGroup={this.props.canChangeGroup}
@@ -735,8 +769,12 @@ export default class ReactCalendarTimeline extends Component {
                groupHeights={groupHeights}
                height={height}
                headerHeight={headerHeight}
-
                fixedHeader={this.props.fixedHeader}
+               canSelect={this.props.canSelectGroups}
+               onSelect={this.selectGroup}
+               onGroupDrop={this.props.onGroupDrop}
+               onGroupContextMenu={this.props.onGroupContextMenu}
+
                zIndex={this.props.zIndexStart + 2}>
         {this.props.children}
       </Sidebar>

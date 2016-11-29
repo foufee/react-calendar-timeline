@@ -215,6 +215,12 @@ $weekend: rgba(250, 246, 225, 0.5);
       margin: 0;
       border-bottom: $border-width solid $border-color;
 
+      &.selected {
+        background: rgb(0,0, 0);
+        border: $item-selected-border;
+        z-index: 2;
+      }
+
       &.rct-sidebar-row-odd {
         background: $row-background-odd;
       }
