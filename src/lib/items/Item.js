@@ -369,6 +369,32 @@ export default class Item extends Component {
       interact(this.refs.item)
         .draggable({enabled: willBeAbleToDrag})
     }
+    interact(this.refs.item)
+      .dropzone({
+          accept: '.draggable',
+          checker: (dragEvent,         // related dragmove or dragend
+                    event,             // Touch, Pointer or Mouse Event
+                    dropped,           // bool default checker result
+                    dropzone,          // dropzone Interactable
+                    dropElement,       // dropzone elemnt
+                    draggable,         // draggable Interactable
+                    draggableElement) => {// draggable element
+            return dropped && this.props.item.dropTarget;
+          },
+          ondrop: (event) => {
+            if (this.props.onItemDrop) {
+              this.props.onItemDrop(this.props.item)
+            }
+            event.target.classList.remove('selected');
+          },
+          ondropmove: (event) => {
+            event.target.classList.add("selected")
+          },
+          ondragleave: (event) => {
+            event.target.classList.remove('selected');
+          },
+        })
+
   }
 
   onMouseDown = (e) => {

@@ -73,6 +73,7 @@ export default class ReactCalendarTimeline extends Component {
     onCanvasClick: PropTypes.func,
     onItemDoubleClick: PropTypes.func,
     onItemContextMenu: PropTypes.func,
+    onItemDrop: PropTypes.func,
     onCanvasDoubleClick: PropTypes.func,
 
     onGroupClick: PropTypes.func,
@@ -726,6 +727,7 @@ export default class ReactCalendarTimeline extends Component {
              itemDrop={this.dropItem}
              onItemDoubleClick={this.props.onItemDoubleClick}
              onItemContextMenu={this.props.onItemContextMenu}
+             onItemDrop={this.props.onItemDrop}
              itemResizing={this.resizingItem}
              itemResized={this.resizedItem} />
     )
@@ -912,7 +914,6 @@ export default class ReactCalendarTimeline extends Component {
                  style={canvasComponentStyle}
                  onDoubleClick={ this.handleDoubleClick }
             >
-              {this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)}
               {this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight)}
               {this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight)}
               {this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight)}
@@ -928,6 +929,7 @@ export default class ReactCalendarTimeline extends Component {
                 headerLabelHeight
                 )
               }
+              {this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)}
             </div>
           </div>
           {sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null}

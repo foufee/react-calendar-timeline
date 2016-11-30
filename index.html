@@ -72,7 +72,7 @@
 
 
     GROUP_COUNT = 100
-    ITEM_COUNT = 100
+    ITEM_COUNT = 1000
     DAYS_IN_PAST = 30
 
     var groups = []
@@ -99,6 +99,7 @@
         canMove: startValue > new Date().getTime(),
         canResize: startValue > new Date().getTime() ? (endValue > new Date().getTime() ? 'both' : 'left') : (endValue > new Date().getTime() ? 'right' : false),
         className: (moment(startDate).day() === 6 || moment(startDate).day() === 0) ? 'item-weekend' : '',
+        dropTarget: Math.random() >= 0.5,
         itemProps: {
           'data-tip': faker.hacker.phrase()
         }
@@ -158,6 +159,9 @@
 
       onItemMove: function (item, time) {
         console.log("Moved", item, time);
+      },
+      onItemDrop: function (item) {
+        console.log("Item Drop", item);
       },
 
       onItemResize: function (item, time, edge) {

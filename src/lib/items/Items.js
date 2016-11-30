@@ -128,7 +128,10 @@ export default class Items extends Component {
                                         onDrop={this.props.itemDrop}
                                         onItemDoubleClick={this.props.onItemDoubleClick}
                                         onContextMenu={this.props.onItemContextMenu}
-                                        onSelect={this.props.itemSelect}/>)}
+                                        onSelect={this.props.itemSelect}
+                                        onItemDrop={this.props.onItemDrop}
+
+                     />)}
       </div>
     )
   }
