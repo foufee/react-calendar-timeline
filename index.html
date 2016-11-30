@@ -6,6 +6,9 @@
 </head>
 <body style='font-family: "Lato";margin: 0;font-size: 13px;'>
   <div id="main"></div>
+  <div class="draggable" >A New Group</div>
+
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.13.0/polyfill.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.js"></script>
@@ -22,9 +25,16 @@
       background: #21F32C;
       border-color: #29B31A;
     }
+
+    .draggable {
+      position: absolute;
+      background: red;
+      width: 100px;
+      z-index: 10;
+    }
   </style>
 
-  <div class="draggable">A New Group</div>
+
   <script>
     function dragMoveListener (event) {
       var target = event.target,
@@ -48,9 +58,9 @@
         inertia: true,
         // keep the element within the area of it's parent
         restrict: {
-          restriction: "parent",
+          //restriction: "parent",
           endOnly: true,
-          elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+          //elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
         },
         autoScroll: true,
         onmove: dragMoveListener,
@@ -61,8 +71,8 @@
   <script>
 
 
-    GROUP_COUNT = 30
-    ITEM_COUNT = 1000
+    GROUP_COUNT = 100
+    ITEM_COUNT = 100
     DAYS_IN_PAST = 30
 
     var groups = []
@@ -161,6 +171,21 @@
       },
       onGroupSelect: function (group) {
         console.log("Group select", group);
+      },
+      onGroupClick: function (group) {
+        console.log("Group click", group);
+      },
+      onGroupTimelineDrop: function (group) {
+        console.log("Timeline Drop", group);
+      },
+      onGroupTimelineContextMenu: function (group) {
+        console.log("Timeline Context Menu", group);
+      },
+      onGroupTimelineSelect: function (group) {
+        console.log("Timeline Select", group);
+      },
+      onGroupTimelineClick: function (group) {
+        console.log("Timeline Click", group);
       },
 
       moveResizeValidator: function(action, item, time, resizeEdge) {

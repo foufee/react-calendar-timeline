@@ -137,7 +137,7 @@ export default class ReactCalendarTimeline extends Component {
     onItemDoubleClick: null,
     onItemContextMenu: null,
 
-    onGropuClick: null,
+    onGroupClick: null,
     onGroupSelect: null,
     onGroupDrop: null,
     onGroupContextMenu: null,
@@ -543,7 +543,7 @@ export default class ReactCalendarTimeline extends Component {
   selectGroup = (group, clickType, e) => {
     if (this.state.selectedGroup === group || (this.props.groupTouchSendsClick && clickType === 'touch')) {
       if (group && this.props.onGroupClick) {
-        this.props.onGroupClick(item, e)
+        this.props.onGroupClick(group, e)
       }
     } else {
       this.setState({selectedGroup: group})
@@ -683,11 +683,15 @@ export default class ReactCalendarTimeline extends Component {
   horizontalLines (canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight) {
     return (
       <HorizontalLines canvasWidth={canvasWidth}
+                       keys={this.props.keys}
                        lineHeight={this.props.lineHeight}
-                       lineCount={_length(this.props.groups)}
                        groups={this.props.groups}
                        groupHeights={groupHeights}
                        headerHeight={headerHeight}
+                       canSelect={this.props.canSelectGroups}
+                       groupTimelineDrag={this.dragOnGroupTimeline}
+                       onGroupTimelineDrop={this.props.onGroupTimelineDrop}
+                       onGroupTimelineContextMenu={this.props.onGroupTimelineContextMenu}
       />
     )
   }
@@ -763,7 +767,6 @@ export default class ReactCalendarTimeline extends Component {
     return (
       <Sidebar groups={this.props.groups}
                keys={this.props.keys}
-
                width={this.props.sidebarWidth}
                lineHeight={this.props.lineHeight}
                groupHeights={groupHeights}
@@ -774,7 +777,6 @@ export default class ReactCalendarTimeline extends Component {
                onSelect={this.selectGroup}
                onGroupDrop={this.props.onGroupDrop}
                onGroupContextMenu={this.props.onGroupContextMenu}
-
                zIndex={this.props.zIndexStart + 2}>
         {this.props.children}
       </Sidebar>
@@ -881,6 +883,8 @@ export default class ReactCalendarTimeline extends Component {
     }
 
     const scrollComponentStyle = {
+      position: 'absolute',
+      left: `${this.props.sidebarWidth}px`,
       width: `${width}px`,
       height: `${height + 20}px`,
       cursor: isDragging ? 'move' : 'default'
@@ -894,7 +898,6 @@ export default class ReactCalendarTimeline extends Component {
     return (
       <div style={this.props.style} ref='container' className='react-calendar-timeline'>
         <div style={outerComponentStyle} className='rct-outer'>
-          {sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null}
           <div ref='scrollComponent'
                className='rct-scroll'
                style={scrollComponentStyle}
@@ -927,6 +930,7 @@ export default class ReactCalendarTimeline extends Component {
               }
             </div>
           </div>
+          {sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null}
         </div>
       </div>
     )

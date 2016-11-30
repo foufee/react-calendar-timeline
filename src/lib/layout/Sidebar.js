@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import interact from 'interact.js'
-import { _get, arraysEqual } from '../utils'
+import { _get, arraysEqual, _length } from '../utils'
 import Group from './Group'
 
 export default class Sidebar extends Component {
@@ -86,6 +86,8 @@ export default class Sidebar extends Component {
     } = this.state
 
     const sidebarStyle = {
+      left: '0px',
+      position: 'absolute',
       width: `${width}px`,
       height: `${height}px`
     }
@@ -99,7 +101,7 @@ export default class Sidebar extends Component {
     const groupsStyle = {
       width: `${width}px`
     }
-
+    console.log("zIndex:",zIndex)
     if (fixedHeader === 'fixed') {
       headerStyle.position = 'fixed'
       headerStyle.zIndex = zIndex
@@ -120,11 +122,18 @@ export default class Sidebar extends Component {
 
     let groupLines = []
     let i = 0
+    let lineCount = _length(groups)
+    let totalHeight = headerHeight
 
-    this.props.groups.forEach((group, index) => {
+    for (let i = 0; i < lineCount; i++) {
+      let group = _get(groups,i)
       const elementStyle = {
-        height: `${groupHeights[index] - 1}px`,
-        lineHeight: `${groupHeights[index] - 1}px`
+        position: 'absolute',
+        left: '0px',
+        top: `${totalHeight}px`,
+        height: `${groupHeights[i] - 1}px`,
+        lineHeight: `${groupHeights[i] - 1}px`,
+        width: `${width}px`
       }
       groupLines.push(
         <Group
@@ -138,8 +147,9 @@ export default class Sidebar extends Component {
           canSelect={_get(group, 'canSelect') !== undefined ? _get(group, 'canSelect') : this.props.canSelect}
           group={group}/>
       )
-      i += 1
-    })
+      totalHeight += groupHeights[i]
+    }
+
 
     return (
       <div ref='sidebar' className='rct-sidebar' style={sidebarStyle}>

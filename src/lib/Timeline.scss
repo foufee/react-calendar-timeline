@@ -33,7 +33,7 @@ $weekend: rgba(250, 246, 225, 0.5);
   .rct-scroll {
     display: inline-block;
     vertical-align: top;
-    overflow-x: scroll;
+    overflow-x: hidden;
     overflow-y: hidden;
     -ms-touch-action: none;
     touch-action: none;
@@ -196,6 +196,7 @@ $weekend: rgba(250, 246, 225, 0.5);
     box-sizing: border-box;
     border-right: $border-width solid $border-color;
 
+
     .rct-sidebar-header {
       margin: 0;
       color: $sidebar-color;
@@ -214,7 +215,6 @@ $weekend: rgba(250, 246, 225, 0.5);
       box-sizing: content-box;
       margin: 0;
       border-bottom: $border-width solid $border-color;
-
       &.selected {
         background: rgb(0,0, 0);
         border: $item-selected-border;
@@ -238,10 +238,19 @@ $weekend: rgba(250, 246, 225, 0.5);
     }
     .rct-hl-odd {
       background: $row-background-odd;
+      &.selected {
+        border: $item-selected-border;
+        z-index: 2;
+      }
     }
     .rct-hl-even {
       background: $row-background-even;
+      &.selected {
+        border: $item-selected-border;
+        z-index: 2;
+      }
     }
+
   }
 
   .rct-vertical-lines {

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import HorizontalLine from './HorizontalLine'
+import { _length, _get  } from '../utils.js'
 
 export default class HorizontalLines extends Component {
   shouldComponentUpdate (nextProps, nextState) {
@@ -9,20 +11,34 @@ export default class HorizontalLines extends Component {
   }
 
   render () {
-    const { lineCount, canvasWidth, groupHeights, headerHeight } = this.props
+    const { groups, canvasWidth, groupHeights, headerHeight } = this.props
     let lines = []
-
+    let lineCount = _length(groups)
     var totalHeight = headerHeight
     for (let i = 0; i < lineCount; i++) {
+      let group = _get(groups,i)
+
+      const elementStyle = {
+        top: `${totalHeight}px`,
+        left: '0px',
+        width: `${canvasWidth}px`,
+        height: `${groupHeights[i] - 1}px`,
+        lineHeight: `${groupHeights[i] - 1}px`,
+        opacity: 0.99
+      }
       lines.push(
-        <div key={`horizontal-line-${i}`}
-             className={i % 2 === 0 ? 'rct-hl-even' : 'rct-hl-odd'}
-             style={{
-               top: `${totalHeight}px`,
-               left: '0px',
-               width: `${canvasWidth}px`,
-               height: `${groupHeights[i] - 1}px`
-             }} />)
+
+        <HorizontalLine
+          keys={this.props.keys}
+          key={`horizontal-line-${i}`}
+          className={i % 2 === 0 ? 'rct-hl-even' : 'rct-hl-odd'}
+          group={group}
+          style={elementStyle}
+          onDrop={this.props.onGroupTimelineDrop}
+          onContextMenu={this.props.onGroupTimelineContextMenu}
+          onSelect={this.props.onGroupTimelineSelect}
+          canSelect={_get(group, 'canSelect') !== undefined ? _get(group, 'canSelect') : this.props.canSelect}
+              />)
       totalHeight += groupHeights[i]
     }
 
@@ -35,9 +51,9 @@ export default class HorizontalLines extends Component {
 }
 
 HorizontalLines.propTypes = {
+  groups: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   canvasWidth: React.PropTypes.number.isRequired,
-  lineHeight: React.PropTypes.number.isRequired,
-  lineCount: React.PropTypes.number.isRequired
+  lineHeight: React.PropTypes.number.isRequired
 }
 HorizontalLines.defaultProps = {
   borderWidth: 1

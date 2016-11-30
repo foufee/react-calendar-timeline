@@ -1,22 +1,7 @@
 import React, { Component } from 'react'
-import interact from 'interact.js'
-import moment from 'moment'
+import { _get} from '../utils'
 
-
-import { _get, deepObjectCompare } from '../utils'
-
-export default class Group extends Component {
-  static propTypes = {
-    group: React.PropTypes.object.isRequired,
-    onSelect: React.PropTypes.func,
-    onDrop: React.PropTypes.func,
-    onContextMenu: React.PropTypes.func
-  }
-
-  static defaultProps = {
-    selected: false
-  }
-
+export default class HorizontalLine extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -26,12 +11,10 @@ export default class Group extends Component {
 
   cacheDataFromProps (props) {
     this.group = props.group
-    this.groupTitle = _get(props.group, props.keys.groupTitleKey)
   }
 
   componentWillReceiveProps (nextProps) {
     this.cacheDataFromProps(nextProps)
-
     let {interactMounted} = this.state
 
     if (!interactMounted) {
@@ -40,21 +23,12 @@ export default class Group extends Component {
   }
 
   mountInteract () {
-    interact(this.refs.group)
+    interact(this.refs.hline)
       .draggable(false)
       .resizable(false)
       .gesturable(false)
       .dropzone({
         accept: '.draggable',
-        checker: (dragEvent,         // related dragmove or dragend
-                   event,             // Touch, Pointer or Mouse Event
-                   dropped,           // bool default checker result
-                   dropzone,          // dropzone Interactable
-                   dropElement,       // dropzone elemnt
-                   draggable,         // draggable Interactable
-                   draggableElement) => {// draggable element
-          return dropped && this.props.group.dropTarget;
-        },
         ondrop: (event) => {
           if (this.props.onDrop) {
             this.props.onDrop(this.props.group)
@@ -119,28 +93,30 @@ export default class Group extends Component {
     }
   }
 
-  render() {
-    const {
-      group,className, style
-    } = this.props
 
-    const {groupIdKey, groupTitleKey} = this.props.keys
-
-    const classNames = className +
-      (group.dropTarget ? ' dropTarget' : ' ')
-
+  render () {
     return (
-    <div {...this.props.group.groupProps}
-         key={_get(group, groupIdKey)}
-         ref='group'
-         className={classNames} style={style}
-         onContextMenu={this.handleContextMenu}
-         onMouseDown={this.onMouseDown}
-         onMouseUp={this.onMouseUp}
-         onTouchStart={this.onTouchStart}
-         onTouchEnd={this.onTouchEnd}>
-        {_get(group, groupTitleKey)}
-    </div>
-    )
+      <div ref='hline'
+           className={this.props.className}
+           style={this.props.style}
+           onContextMenu={this.handleContextMenu}
+           onMouseDown={this.onMouseDown}
+           onMouseUp={this.onMouseUp}
+           onTouchStart={this.onTouchStart}
+           onTouchEnd={this.onTouchEnd}
+      />)
   }
+}
+
+HorizontalLine.propTypes = {
+  group: React.PropTypes.object.isRequired,
+  onSelect: React.PropTypes.func,
+  onDrop: React.PropTypes.func,
+  onContextMenu: React.PropTypes.func
+}
+
+HorizontalLine.defaultProps = {
+  borderWidth: 1,
+  selected: false
+
 }
