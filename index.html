@@ -3,6 +3,7 @@
 <head>
   <title>react calendar timeline Demo</title>
   <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+  <script src="https://use.fontawesome.com/742757c98f.js"></script>
 </head>
 <body style='font-family: "Lato";margin: 0;font-size: 13px;'>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.13.0/polyfill.min.js"></script>
@@ -111,13 +112,16 @@
     };
 
     var items = []
-    for (var i = 0; i < ITEM_COUNT; i++) {
+    var i = 0;
+    for (i = 0; i < ITEM_COUNT; i++) {
       var startDate = faker.date.recent(DAYS_IN_PAST).valueOf() + (DAYS_IN_PAST * 0.3) * 86400 * 1000;
       var startValue = Math.floor(moment(startDate).valueOf() / 10000000) * 10000000;
       var endValue = moment(startDate + faker.random.number({min: 2, max: 20})*15*60*1000).valueOf();
+      console.log(startValue);
+      console.log(endValue);
       items.push({
         id: i+'',
-        group: faker.random.number({min: 1, max: groups.length})+'',
+        group: 1+'', //faker.random.number({min: 1, max: groups.length})+'',
         title: faker.hacker.phrase(),
         start: startValue,
         end: endValue,
@@ -126,12 +130,16 @@
         className: (moment(startDate).day() === 6 || moment(startDate).day() === 0) ? 'item-weekend' : '',
         dropTarget: Math.random() >= 0.5,
         itemProps: {
-          'data-tip': faker.hacker.phrase()
+          'data-tip': 'Boo' + faker.hacker.phrase()
         }
       })
     }
+  console.log(moment("2017-01-05T09:00:00").unix()*1000)
 
     items = items.sort(function(a, b) { return b - a; })
+
+    groups = [
+        {id:1+'',title:"Boo A03"}];
 
     var minTime = moment().add(-6, 'months').valueOf()
     var maxTime = moment().add(6, 'months').valueOf()
