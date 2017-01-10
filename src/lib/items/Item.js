@@ -140,6 +140,7 @@ export default class Item extends Component {
         return 0
       }
       let groupDelta = 0
+
       for (var key of Object.keys(groupTops)) {
         var item = groupTops[key]
         if (e.pageY - topOffset > item) {
@@ -216,10 +217,9 @@ export default class Item extends Component {
           let dragGroupDelta = this.dragGroupDelta(e)
 
           if (this.props.moveResizeValidator) {
-            let {newDragTime, newGroup} = this.props.moveResizeValidator('move', this.props.item, dragTime, undefined, this.props.order + dragGroupDelta)
-            dragTime = newDragTime;
-            dragGroupDelta = newGroup - this.props.order;
+            dragTime = this.props.moveResizeValidator('move', this.props.item, dragTime)
           }
+
           if (this.props.onDrag) {
             this.props.onDrag(this.itemId, dragTime, this.props.order + dragGroupDelta)
           }
@@ -234,15 +234,12 @@ export default class Item extends Component {
         if (this.state.dragging) {
           if (this.props.onDrop) {
             let dragTime = this.dragTime(e)
-            let dragGroupDelta = this.dragGroupDelta(e)
 
             if (this.props.moveResizeValidator) {
-              let {newDragTime, newGroup} = this.props.moveResizeValidator('move', this.props.item, dragTime, undefined, this.props.order + dragGroupDelta)
-              dragTime = newDragTime;
-              dragGroupDelta = newGroup - this.props.order;
+              dragTime = this.props.moveResizeValidator('move', this.props.item, dragTime)
             }
 
-            this.props.onDrop(this.props.item, dragTime, this.props.order + dragGroupDelta)
+            this.props.onDrop(this.itemId, dragTime, this.props.order + this.dragGroupDelta(e))
           }
 
           this.setState({
@@ -302,7 +299,7 @@ export default class Item extends Component {
           }
 
           if (this.props.onResized && this.resizeTimeDelta(e, resizeEdge) !== 0) {
-            this.props.onResized(this.props.item, resizeTime, resizeEdge)
+            this.props.onResized(this.itemId, resizeTime, resizeEdge)
           }
           this.setState({
             resizing: null,
@@ -479,9 +476,6 @@ export default class Item extends Component {
     }
     console.log(style)
 
-    let title = this.props.titleRenderer ? this.props.titleRenderer(this.props.item) : this.itemTitle
-    let block = this.props.itemRenderer ? this.props.itemRenderer(this.props.item,"rct-item-content",title) : <div className="rct-item-content">{title}</div>
-
     return (
       <div {...this.props.item.itemProps}
            key={this.itemId}
@@ -495,11 +489,12 @@ export default class Item extends Component {
            onDoubleClick={this.handleDoubleClick}
            onContextMenu={this.handleContextMenu}
            style={style}>
-
-        <div className='rct-item-overflow'>
-          {block}
-        </div>
         {this.props.useResizeHandle ? <div ref='dragLeft' className='rct-drag-left'></div> : ''}
+        <div className='rct-item-overflow'>
+          <div className='rct-item-content'>
+            {this.itemTitle}
+          </div>
+        </div>
         {this.props.useResizeHandle ? <div ref='dragRight' className='rct-drag-right'></div> : ''}
       </div>
     )

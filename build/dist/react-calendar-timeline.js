@@ -78,8 +78,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -192,7 +190,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    _this.state = {
-	      scrollBarWidthFudgeFactor: 48,
 	      width: 1000,
 	
 	      visibleTimeStart: visibleTimeStart,
@@ -255,14 +252,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'resize',
 	    value: function resize() {
-	      console.log("Resizing goodness");
 	      // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
-	
 	      var _refs$container$getBo = this.refs.container.getBoundingClientRect(),
 	          containerWidth = _refs$container$getBo.width,
 	          containerTop = _refs$container$getBo.top;
 	
-	      var width = containerWidth - this.props.sidebarWidth - this.state.scrollBarWidthFudgeFactor;
+	      var width = containerWidth - this.props.sidebarWidth;
 	
 	      var _stackItems = this.stackItems(this.props.items, this.props.groups, this.state.canvasTimeStart, this.state.visibleTimeStart, this.state.visibleTimeEnd, width),
 	          dimensionItems = _stackItems.dimensionItems,
@@ -276,8 +271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dimensionItems: dimensionItems,
 	        height: height,
 	        groupHeights: groupHeights,
-	        groupTops: groupTops,
-	        scrollBarWidthFudgeFactor: 0
+	        groupTops: groupTops
 	      });
 	      this.refs.scrollComponent.scrollLeft = width;
 	    }
@@ -365,6 +359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var row = Math.floor((y - lineHeight * 2) / lineHeight);
 	      var time = Math.round(visibleTimeStart + x / width * (visibleTimeEnd - visibleTimeStart));
 	      time = Math.floor(time / dragSnap) * dragSnap;
+	
 	      return [row, time];
 	    }
 	  }, {
@@ -396,11 +391,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'horizontalLines',
-	    value: function horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap) {
-	      return _react2.default.createElement(_HorizontalLines2.default, { canvasTimeStart: canvasTimeStart,
-	        canvasTimeEnd: canvasTimeEnd,
-	        canvasWidth: canvasWidth,
-	        dragSnap: dragSnap,
+	    value: function horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight) {
+	      return _react2.default.createElement(_HorizontalLines2.default, { canvasWidth: canvasWidth,
 	        keys: this.props.keys,
 	        lineHeight: this.props.lineHeight,
 	        groups: this.props.groups,
@@ -436,7 +428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        canResize: this.props.canResize,
 	        useResizeHandle: this.props.useResizeHandle,
 	        canSelect: this.props.canSelect,
-	        moveResizeValidator: this.moveResizeValidator,
+	        moveResizeValidator: this.props.moveResizeValidator,
 	        topOffset: this.state.topOffset,
 	        itemSelect: this.selectItem,
 	        itemDrag: this.dragItem,
@@ -445,9 +437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        onItemContextMenu: this.props.onItemContextMenu,
 	        onItemDrop: this.props.onItemDrop,
 	        itemResizing: this.resizingItem,
-	        itemResized: this.resizedItem,
-	        titleRenderer: this.props.titleRenderer,
-	        itemRenderer: this.props.itemRenderer });
+	        itemResized: this.resizedItem });
 	    }
 	  }, {
 	    key: 'infoLabel',
@@ -459,6 +449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (this.state.resizeTime) {
 	        label = (0, _moment2.default)(this.state.resizeTime).format('LLL');
 	      }
+	
 	      return label ? _react2.default.createElement(_InfoLabel2.default, { label: label }) : '';
 	    }
 	  }, {
@@ -575,8 +566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          headerLabelGroupHeight = _props4.headerLabelGroupHeight,
 	          headerLabelHeight = _props4.headerLabelHeight,
 	          sidebarWidth = _props4.sidebarWidth,
-	          timeSteps = _props4.timeSteps,
-	          dragSnap = _props4.dragSnap;
+	          timeSteps = _props4.timeSteps;
 	      var _state4 = this.state,
 	          draggingItem = _state4.draggingItem,
 	          resizingItem = _state4.resizingItem,
@@ -610,6 +600,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      var scrollComponentStyle = {
+	        position: 'absolute',
+	        left: this.props.sidebarWidth + 'px',
 	        width: width + 'px',
 	        height: height + 20 + 'px',
 	        cursor: isDragging ? 'move' : 'default'
@@ -622,11 +614,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return _react2.default.createElement(
 	        'div',
-	        { style: this.props.style, ref: 'container', className: 'react-calendar-timeline', onMouseLeave: this.handleMouseUp },
+	        { style: this.props.style, ref: 'container', className: 'react-calendar-timeline' },
 	        _react2.default.createElement(
 	          'div',
 	          { style: outerComponentStyle, className: 'rct-outer' },
-	          sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null,
 	          _react2.default.createElement(
 	            'div',
 	            { ref: 'scrollComponent',
@@ -646,13 +637,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                onDoubleClick: this.handleDoubleClick
 	              },
 	              this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight),
-	              this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap),
+	              this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight),
 	              this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight),
 	              this.infoLabel(),
 	              this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight),
 	              this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)
 	            )
-	          )
+	          ),
+	          sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null
 	        )
 	      );
 	    }
@@ -726,9 +718,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  onTimeChange: _react.PropTypes.func,
 	  onTimeInit: _react.PropTypes.func,
 	  onBoundsChange: _react.PropTypes.func,
-	
-	  itemRenderer: _react.PropTypes.func,
-	  titleRenderer: _react.PropTypes.func,
 	
 	  children: _react.PropTypes.node
 	};
@@ -1088,36 +1077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.dropItem = function (item, dragTime, newGroupOrder) {
 	    _this3.setState({ draggingItem: null, dragTime: null, dragGroupTitle: null });
 	    if (_this3.props.onItemMove) {
-	      var group = _this3.props.groups[newGroupOrder];
-	      _this3.props.onItemMove(item, dragTime, group);
-	    }
-	  };
-	
-	  this.moveResizeValidator = function (action, item, time, resizeEdge, newGroupIndex) {
-	    if (_this3.props.moveResizeValidator) {
-	      // Convert to group (for external API), and back to index
-	      var group = _this3.props.groups[newGroupIndex];
-	      if (action === 'resize') {
-	        return _this3.props.moveResizeValidator(action, item, time, resizeEdge, group);
-	      } else {
-	        var _ret = function () {
-	          var _props$moveResizeVali = _this3.props.moveResizeValidator(action, item, time, resizeEdge, group),
-	              newDragTime = _props$moveResizeVali.newDragTime,
-	              newGroup = _props$moveResizeVali.newGroup;
-	
-	          var updatedGroupIndex = _this3.props.groups.findIndex(function (group) {
-	            return group.id === newGroup;
-	          });
-	          return {
-	            v: {
-	              newDragTime: newDragTime,
-	              newGroup: updatedGroupIndex
-	            }
-	          };
-	        }();
-	
-	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	      }
+	      _this3.props.onItemMove(item, dragTime, newGroupOrder);
 	    }
 	  };
 	
@@ -1384,9 +1344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            onItemDoubleClick: _this2.props.onItemDoubleClick,
 	            onContextMenu: _this2.props.onItemContextMenu,
 	            onSelect: _this2.props.itemSelect,
-	            onItemDrop: _this2.props.onItemDrop,
-	            itemRenderer: _this2.props.itemRenderer,
-	            titleRenderer: _this2.props.titleRenderer
+	            onItemDrop: _this2.props.onItemDrop
 	
 	          });
 	        })
@@ -1425,10 +1383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  itemResized: _react.PropTypes.func,
 	
 	  onItemDoubleClick: _react.PropTypes.func,
-	  onItemContextMenu: _react.PropTypes.func,
-	
-	  titleRenderer: _react.PropTypes.func,
-	  itemRenderer: _react.PropTypes.func
+	  onItemContextMenu: _react.PropTypes.func
 	};
 	Items.defaultProps = {};
 	exports.default = Items;
@@ -1617,6 +1572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return 0;
 	        }
 	        var groupDelta = 0;
+	
 	        var _iteratorNormalCompletion = true;
 	        var _didIteratorError = false;
 	        var _iteratorError = undefined;
@@ -1714,13 +1670,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var dragGroupDelta = _this2.dragGroupDelta(e);
 	
 	          if (_this2.props.moveResizeValidator) {
-	            var _props$moveResizeVali = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime, undefined, _this2.props.order + dragGroupDelta),
-	                newDragTime = _props$moveResizeVali.newDragTime,
-	                newGroup = _props$moveResizeVali.newGroup;
-	
-	            dragTime = newDragTime;
-	            dragGroupDelta = newGroup - _this2.props.order;
+	            dragTime = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime);
 	          }
+	
 	          if (_this2.props.onDrag) {
 	            _this2.props.onDrag(_this2.itemId, dragTime, _this2.props.order + dragGroupDelta);
 	          }
@@ -1734,18 +1686,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_this2.state.dragging) {
 	          if (_this2.props.onDrop) {
 	            var dragTime = _this2.dragTime(e);
-	            var dragGroupDelta = _this2.dragGroupDelta(e);
 	
 	            if (_this2.props.moveResizeValidator) {
-	              var _props$moveResizeVali2 = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime, undefined, _this2.props.order + dragGroupDelta),
-	                  newDragTime = _props$moveResizeVali2.newDragTime,
-	                  newGroup = _props$moveResizeVali2.newGroup;
-	
-	              dragTime = newDragTime;
-	              dragGroupDelta = newGroup - _this2.props.order;
+	              dragTime = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime);
 	            }
 	
-	            _this2.props.onDrop(_this2.props.item, dragTime, _this2.props.order + dragGroupDelta);
+	            _this2.props.onDrop(_this2.itemId, dragTime, _this2.props.order + _this2.dragGroupDelta(e));
 	          }
 	
 	          _this2.setState({
@@ -1803,7 +1749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	
 	          if (_this2.props.onResized && _this2.resizeTimeDelta(e, resizeEdge) !== 0) {
-	            _this2.props.onResized(_this2.props.item, resizeTime, resizeEdge);
+	            _this2.props.onResized(_this2.itemId, resizeTime, resizeEdge);
 	          }
 	          _this2.setState({
 	            resizing: null,
@@ -1939,13 +1885,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	      console.log(style);
 	
-	      var title = this.props.titleRenderer ? this.props.titleRenderer(this.props.item) : this.itemTitle;
-	      var block = this.props.itemRenderer ? this.props.itemRenderer(this.props.item, "rct-item-content", title) : _react2.default.createElement(
-	        'div',
-	        { className: 'rct-item-content' },
-	        title
-	      );
-	
 	      return _react2.default.createElement(
 	        'div',
 	        _extends({}, this.props.item.itemProps, {
@@ -1960,12 +1899,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          onDoubleClick: this.handleDoubleClick,
 	          onContextMenu: this.handleContextMenu,
 	          style: style }),
+	        this.props.useResizeHandle ? _react2.default.createElement('div', { ref: 'dragLeft', className: 'rct-drag-left' }) : '',
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'rct-item-overflow' },
-	          block
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'rct-item-content' },
+	            this.itemTitle
+	          )
 	        ),
-	        this.props.useResizeHandle ? _react2.default.createElement('div', { ref: 'dragLeft', className: 'rct-drag-left' }) : '',
 	        this.props.useResizeHandle ? _react2.default.createElement('div', { ref: 'dragRight', className: 'rct-drag-right' }) : ''
 	      );
 	    }
@@ -2727,13 +2670,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _props$keys = this.props.keys,
 	          groupIdKey = _props$keys.groupIdKey,
 	          groupTitleKey = _props$keys.groupTitleKey;
-	
-	      var groups = this.props.groups;
 	      var scrollTop = this.state.scrollTop;
 	
 	
 	      var sidebarStyle = {
 	        left: '0px',
+	        position: 'absolute',
 	        width: width + 'px',
 	        height: height + 'px'
 	      };
@@ -2747,6 +2689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var groupsStyle = {
 	        width: width + 'px'
 	      };
+	      console.log("zIndex:", zIndex);
 	      if (fixedHeader === 'fixed') {
 	        headerStyle.position = 'fixed';
 	        headerStyle.zIndex = zIndex;
@@ -2769,12 +2712,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var groupLines = [];
 	      var i = 0;
-	      var lineCount = (0, _utils._length)(this.props.groups);
+	      var lineCount = (0, _utils._length)(groups);
 	      var totalHeight = headerHeight;
 	
 	      for (var _i = 0; _i < lineCount; _i++) {
-	        var group = (0, _utils._get)(this.props.groups, _i);
+	        var group = (0, _utils._get)(groups, _i);
 	        var elementStyle = {
+	          position: 'absolute',
 	          left: '0px',
 	          top: totalHeight + 'px',
 	          height: groupHeights[_i] - 1 + 'px',
@@ -3246,11 +3190,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        })();
 	      }
 	
-	      var delta = timeSteps[minUnit];
-	      var leftTime = (0, _moment2.default)(visibleTimeStart).startOf(minUnit);
-	      var value = leftTime.get(minUnit);
-	      leftTime.set(minUnit, value - value % timeSteps[minUnit]);
-	
 	      (0, _utils.iterateTimes)(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps, function (time, nextTime) {
 	        var left = Math.round((time.valueOf() - canvasTimeStart) * ratio, -2);
 	        var minUnitValue = time.get(minUnit === 'day' ? 'date' : minUnit);
@@ -3259,26 +3198,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var borderWidth = firstOfType ? 2 : 1;
 	        var leftCorrect = fixedHeader === 'fixed' ? Math.round((canvasTimeStart - visibleTimeStart) * ratio) - borderWidth + 1 : 0;
 	
-	        if (time.valueOf() <= visibleTimeEnd && time.valueOf() >= leftTime || true) {
-	          timeLabels.push(_react2.default.createElement(
-	            'div',
-	            { key: 'label-' + time.valueOf(),
-	              href: '#',
-	              className: 'rct-label ' + (twoHeaders ? '' : 'rct-label-only') + ' ' + (firstOfType ? 'rct-first-of-type' : '') + ' ',
-	              'data-time': time,
-	              'data-unit': minUnit,
-	              style: {
-	                top: (minUnit === 'year' ? 0 : headerLabelGroupHeight) + 'px',
-	                left: left + leftCorrect + 'px',
-	                width: labelWidth + 'px',
-	                height: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
-	                lineHeight: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
-	                fontSize: (labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10') + 'px',
-	                cursor: 'pointer'
-	              } },
-	            _this3.subHeaderLabel(time, minUnit, labelWidth)
-	          ));
-	        }
+	        timeLabels.push(_react2.default.createElement(
+	          'div',
+	          { key: 'label-' + time.valueOf(),
+	            href: '#',
+	            className: 'rct-label ' + (twoHeaders ? '' : 'rct-label-only') + ' ' + (firstOfType ? 'rct-first-of-type' : '') + ' ',
+	            'data-time': time,
+	            'data-unit': minUnit,
+	            style: {
+	              top: (minUnit === 'year' ? 0 : headerLabelGroupHeight) + 'px',
+	              left: left + leftCorrect + 'px',
+	              width: labelWidth + 'px',
+	              height: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
+	              lineHeight: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
+	              fontSize: (labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10') + 'px',
+	              cursor: 'pointer'
+	            } },
+	          _this3.subHeaderLabel(time, minUnit, labelWidth)
+	        ));
 	      });
 	
 	      var zIndex = this.props.zIndex;
@@ -3458,8 +3395,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _HorizontalLines$prop;
-	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(2);
@@ -3473,8 +3408,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _utils = __webpack_require__(11);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -3520,10 +3453,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          opacity: 0.99
 	        };
 	        lines.push(_react2.default.createElement(_HorizontalLine2.default, {
-	          canvasTimeStart: this.props.canvasTimeStart,
-	          canvasTimeEnd: this.props.canvasTimeEnd,
-	          canvasWidth: this.props.canvasWidth,
-	          dragSnap: this.props.dragSnap,
 	          keys: this.props.keys,
 	          key: 'horizontal-line-' + i,
 	          className: i % 2 === 0 ? 'rct-hl-even' : 'rct-hl-odd',
@@ -3551,12 +3480,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HorizontalLines;
 	
 	
-	HorizontalLines.propTypes = (_HorizontalLines$prop = {
-	  canvasTimeStart: _react2.default.PropTypes.number.isRequired,
-	  canvasTimeEnd: _react2.default.PropTypes.number.isRequired,
+	HorizontalLines.propTypes = {
+	  groups: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object).isRequired,
 	  canvasWidth: _react2.default.PropTypes.number.isRequired,
-	  groups: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object).isRequired
-	}, _defineProperty(_HorizontalLines$prop, 'canvasWidth', _react2.default.PropTypes.number.isRequired), _defineProperty(_HorizontalLines$prop, 'lineHeight', _react2.default.PropTypes.number.isRequired), _HorizontalLines$prop);
+	  lineHeight: _react2.default.PropTypes.number.isRequired
+	};
 	HorizontalLines.defaultProps = {
 	  borderWidth: 1
 	};
@@ -3579,14 +3507,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(11);
 	
-	var _interact = __webpack_require__(10);
-	
-	var _interact2 = _interopRequireDefault(_interact);
-	
-	var _moment = __webpack_require__(3);
-	
-	var _moment2 = _interopRequireDefault(_moment);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3607,8 +3527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (_this.props.onContextMenu) {
 	        e.preventDefault();
 	        e.stopPropagation();
-	        var dropTime = _this.dragTime(e);
-	        _this.props.onContextMenu(_this.group, (0, _moment2.default)(dropTime));
+	        _this.props.onContextMenu(_this.group, e);
 	      }
 	    };
 	
@@ -3622,7 +3541,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _this.onMouseUp = function (e) {
 	      if (!_this.state.interactMounted && _this.startedClicking) {
 	        _this.startedClicking = false;
-	        console.log("Clicky uip");
 	        _this.actualClick(e, 'click');
 	      }
 	    };
@@ -3664,54 +3582,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
-	    key: 'dragTimeSnap',
-	    value: function dragTimeSnap(dragTime, considerOffset) {
-	      var dragSnap = this.props.dragSnap;
-	
-	      if (dragSnap) {
-	        var offset = considerOffset ? (0, _moment2.default)().utcOffset() * 60 * 1000 : 0;
-	        return Math.round(dragTime / dragSnap) * dragSnap - offset % dragSnap;
-	      } else {
-	        return dragTime;
-	      }
-	    }
-	  }, {
-	    key: 'coordinateToTimeRatio',
-	    value: function coordinateToTimeRatio() {
-	      var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
-	
-	      return (props.canvasTimeEnd - props.canvasTimeStart) / props.canvasWidth;
-	    }
-	  }, {
-	    key: 'dragTime',
-	    value: function dragTime(e) {
-	      var dragSnap = this.props.dragSnap;
-	
-	      var viewportOffset = this.refs.hline.getBoundingClientRect();
-	      var x = e.pageX - viewportOffset.left;
-	
-	      var time = Math.round(this.props.canvasTimeStart + x / this.props.canvasWidth * (this.props.canvasTimeEnd - this.props.canvasTimeStart));
-	      time = Math.floor(time / dragSnap) * dragSnap;
-	      return time;
-	    }
-	  }, {
 	    key: 'mountInteract',
 	    value: function mountInteract() {
 	      var _this2 = this;
 	
 	      console.log("NMount");
-	      (0, _interact2.default)(this.refs.hline).draggable(false).resizable(false).gesturable(false).dropzone({
+	      interact(this.refs.hline).draggable(false).resizable(false).gesturable(false).dropzone({
 	        accept: '.draggable',
 	        ondrop: function ondrop(event) {
-	          var dropTime = _this2.dragTime(event.dragEvent);
-	          _this2.props.onDrop(_this2.props.group, (0, _moment2.default)(dropTime));
+	          if (_this2.props.onDrop) {
+	            _this2.props.onDrop(_this2.props.group);
+	          }
 	          event.target.classList.remove('selected');
 	        },
 	        ondropmove: function ondropmove(event) {
 	          event.target.classList.add("selected");
 	        },
 	        ondragleave: function ondragleave(event) {
-	          console.log("onDropLeave");
 	          event.target.classList.remove('selected');
 	        }
 	      }).on('tap', function (e) {
@@ -3725,8 +3612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'actualClick',
 	    value: function actualClick(e, clickType) {
 	      if (this.props.canSelect && this.props.onSelect) {
-	        var clickTime = this.dragTime(e);
-	        this.props.onSelect(this.group, clickTime, clickType, e);
+	        this.props.onSelect(this.group, clickType, e);
 	      }
 	    }
 	  }, {
@@ -3751,9 +3637,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	HorizontalLine.propTypes = {
-	  canvasTimeStart: _react2.default.PropTypes.number.isRequired,
-	  canvasTimeEnd: _react2.default.PropTypes.number.isRequired,
-	  canvasWidth: _react2.default.PropTypes.number.isRequired,
 	  group: _react2.default.PropTypes.object.isRequired,
 	  onSelect: _react2.default.PropTypes.func,
 	  onDrop: _react2.default.PropTypes.func,
