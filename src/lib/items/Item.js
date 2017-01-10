@@ -96,6 +96,7 @@ export default class Item extends Component {
   }
 
   coordinateToTimeRatio (props = this.props) {
+    console.log(props)
     return (props.canvasTimeEnd - props.canvasTimeStart) / props.canvasWidth
   }
 
@@ -180,6 +181,9 @@ export default class Item extends Component {
   mountInteract () {
     const leftResize = this.props.useResizeHandle ? this.refs.dragLeft : true
     const rightResize = this.props.useResizeHandle ? this.refs.dragRight : true
+
+    console.log("Here")
+    console.log(interact(this.refs.item));
 
     interact(this.refs.item)
       .resizable({
@@ -470,6 +474,7 @@ export default class Item extends Component {
       height: `${dimensions.height}px`,
       lineHeight: `${dimensions.height}px`
     }
+    console.log(style)
 
     return (
       <div {...this.props.item.itemProps}

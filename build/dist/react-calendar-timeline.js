@@ -104,19 +104,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Sidebar2 = _interopRequireDefault(_Sidebar);
 	
-	var _Header = __webpack_require__(16);
+	var _Header = __webpack_require__(17);
 	
 	var _Header2 = _interopRequireDefault(_Header);
 	
-	var _VerticalLines = __webpack_require__(17);
+	var _VerticalLines = __webpack_require__(18);
 	
 	var _VerticalLines2 = _interopRequireDefault(_VerticalLines);
 	
-	var _HorizontalLines = __webpack_require__(18);
+	var _HorizontalLines = __webpack_require__(19);
 	
 	var _HorizontalLines2 = _interopRequireDefault(_HorizontalLines);
 	
-	var _TodayLine = __webpack_require__(19);
+	var _TodayLine = __webpack_require__(21);
 	
 	var _TodayLine2 = _interopRequireDefault(_TodayLine);
 	
@@ -197,6 +197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      canvasTimeStart: visibleTimeStart - (visibleTimeEnd - visibleTimeStart),
 	
 	      selectedItem: null,
+	      selectedGroup: null,
 	      dragTime: null,
 	      dragGroupTitle: null,
 	      resizeTime: null,
@@ -392,11 +393,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'horizontalLines',
 	    value: function horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight) {
 	      return _react2.default.createElement(_HorizontalLines2.default, { canvasWidth: canvasWidth,
+	        keys: this.props.keys,
 	        lineHeight: this.props.lineHeight,
-	        lineCount: (0, _utils._length)(this.props.groups),
 	        groups: this.props.groups,
 	        groupHeights: groupHeights,
-	        headerHeight: headerHeight
+	        headerHeight: headerHeight,
+	        canSelect: this.props.canSelectGroups,
+	        groupTimelineDrag: this.dragOnGroupTimeline,
+	        onGroupTimelineDrop: this.props.onGroupTimelineDrop,
+	        onGroupTimelineContextMenu: this.props.onGroupTimelineContextMenu
 	      });
 	    }
 	  }, {
@@ -415,6 +420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        groups: this.props.groups,
 	        keys: this.props.keys,
 	        selectedItem: this.state.selectedItem,
+	        selectedGroup: this.state.selectedGroup,
 	        dragSnap: this.props.dragSnap,
 	        minResizeWidth: this.props.minResizeWidth,
 	        canChangeGroup: this.props.canChangeGroup,
@@ -429,6 +435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        itemDrop: this.dropItem,
 	        onItemDoubleClick: this.props.onItemDoubleClick,
 	        onItemContextMenu: this.props.onItemContextMenu,
+	        onItemDrop: this.props.onItemDrop,
 	        itemResizing: this.resizingItem,
 	        itemResized: this.resizedItem });
 	    }
@@ -471,14 +478,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _Sidebar2.default,
 	        { groups: this.props.groups,
 	          keys: this.props.keys,
-	
 	          width: this.props.sidebarWidth,
 	          lineHeight: this.props.lineHeight,
 	          groupHeights: groupHeights,
 	          height: height,
 	          headerHeight: headerHeight,
-	
 	          fixedHeader: this.props.fixedHeader,
+	          canSelect: this.props.canSelectGroups,
+	          onSelect: this.selectGroup,
+	          onGroupDrop: this.props.onGroupDrop,
+	          onGroupContextMenu: this.props.onGroupContextMenu,
 	          zIndex: this.props.zIndexStart + 2 },
 	        this.props.children
 	      );
@@ -591,6 +600,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      var scrollComponentStyle = {
+	        position: 'absolute',
+	        left: this.props.sidebarWidth + 'px',
 	        width: width + 'px',
 	        height: height + 20 + 'px',
 	        cursor: isDragging ? 'move' : 'default'
@@ -607,7 +618,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _react2.default.createElement(
 	          'div',
 	          { style: outerComponentStyle, className: 'rct-outer' },
-	          sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null,
 	          _react2.default.createElement(
 	            'div',
 	            { ref: 'scrollComponent',
@@ -626,14 +636,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                style: canvasComponentStyle,
 	                onDoubleClick: this.handleDoubleClick
 	              },
-	              this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops),
 	              this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight),
 	              this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight),
 	              this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight),
 	              this.infoLabel(),
-	              this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight)
+	              this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight),
+	              this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)
 	            )
-	          )
+	          ),
+	          sidebarWidth > 0 ? this.sidebar(height, groupHeights, headerHeight) : null
 	        )
 	      );
 	    }
@@ -666,12 +677,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  canResize: _react.PropTypes.oneOf([true, false, 'left', 'right', 'both']),
 	  useResizeHandle: _react.PropTypes.bool,
 	  canSelect: _react.PropTypes.bool,
+	  canSelectGroups: _react.PropTypes.bool,
 	
 	  stackItems: _react.PropTypes.bool,
 	
 	  traditionalZoom: _react.PropTypes.bool,
 	
 	  itemTouchSendsClick: _react.PropTypes.bool,
+	  groupTouchSendsClick: _react.PropTypes.bool,
 	
 	  onItemMove: _react.PropTypes.func,
 	  onItemResize: _react.PropTypes.func,
@@ -680,7 +693,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  onCanvasClick: _react.PropTypes.func,
 	  onItemDoubleClick: _react.PropTypes.func,
 	  onItemContextMenu: _react.PropTypes.func,
+	  onItemDrop: _react.PropTypes.func,
 	  onCanvasDoubleClick: _react.PropTypes.func,
+	
+	  onGroupClick: _react.PropTypes.func,
+	  onGroupSelect: _react.PropTypes.func,
+	  onGroupDrop: _react.PropTypes.func,
+	  onGroupContextMenu: _react.PropTypes.func,
 	
 	  moveResizeValidator: _react.PropTypes.func,
 	
@@ -724,6 +743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  canResize: 'right',
 	  useResizeHandle: false,
 	  canSelect: true,
+	  canSelectGroups: false,
 	
 	  stackItems: false,
 	
@@ -737,6 +757,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  onItemDoubleClick: null,
 	  onItemContextMenu: null,
 	
+	  onGroupClick: null,
+	  onGroupSelect: null,
+	  onGroupDrop: null,
+	  onGroupContextMenu: null,
+	
 	  moveResizeValidator: null,
 	
 	  dayBackground: null,
@@ -745,6 +770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  defaultTimeEnd: null,
 	
 	  itemTouchSendsClick: false,
+	  groupTouchSendsClick: false,
 	
 	  style: {},
 	  keys: defaultKeys,
@@ -998,6 +1024,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	
+	  this.selectGroup = function (group, clickType, e) {
+	    if (_this3.state.selectedGroup === group || _this3.props.groupTouchSendsClick && clickType === 'touch') {
+	      if (group && _this3.props.onGroupClick) {
+	        _this3.props.onGroupClick(group, e);
+	      }
+	    } else {
+	      _this3.setState({ selectedGroup: group });
+	      if (group && _this3.props.onGroupSelect) {
+	        _this3.props.onGroupSelect(group, e);
+	      }
+	    }
+	  };
+	
 	  this.scrollAreaClick = function (e) {
 	    // if not clicking on an item
 	
@@ -1014,6 +1053,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var groupId = (0, _utils._get)(_this3.props.groups[row], _this3.props.keys.groupIdKey);
 	          _this3.props.onCanvasClick(groupId, time, e);
 	        }
+	      }
+	    }
+	    if (!(0, _utils.hasSomeParentTheClass)(e.target, 'rct-sidebar')) {
+	      if (_this3.state.selectedGroup) {
+	        _this3.selectGroup(null);
 	      }
 	    }
 	  };
@@ -1299,7 +1343,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            onDrop: _this2.props.itemDrop,
 	            onItemDoubleClick: _this2.props.onItemDoubleClick,
 	            onContextMenu: _this2.props.onItemContextMenu,
-	            onSelect: _this2.props.itemSelect });
+	            onSelect: _this2.props.itemSelect,
+	            onItemDrop: _this2.props.onItemDrop
+	
+	          });
 	        })
 	      );
 	    }
@@ -1471,6 +1518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function coordinateToTimeRatio() {
 	      var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
 	
+	      console.log(props);
 	      return (props.canvasTimeEnd - props.canvasTimeStart) / props.canvasWidth;
 	    }
 	  }, {
@@ -1590,6 +1638,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var leftResize = this.props.useResizeHandle ? this.refs.dragLeft : true;
 	      var rightResize = this.props.useResizeHandle ? this.refs.dragRight : true;
+	
+	      console.log("Here");
+	      console.log((0, _interact2.default)(this.refs.item));
 	
 	      (0, _interact2.default)(this.refs.item).resizable({
 	        edges: {
@@ -1747,6 +1798,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
+	      var _this3 = this;
+	
 	      this.cacheDataFromProps(nextProps);
 	
 	      var interactMounted = this.state.interactMounted;
@@ -1780,6 +1833,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (interactMounted && couldDrag !== willBeAbleToDrag) {
 	        (0, _interact2.default)(this.refs.item).draggable({ enabled: willBeAbleToDrag });
 	      }
+	      (0, _interact2.default)(this.refs.item).dropzone({
+	        accept: '.draggable',
+	        checker: function checker(dragEvent, // related dragmove or dragend
+	        event, // Touch, Pointer or Mouse Event
+	        dropped, // bool default checker result
+	        dropzone, // dropzone Interactable
+	        dropElement, // dropzone elemnt
+	        draggable, // draggable Interactable
+	        draggableElement) {
+	          // draggable element
+	          return dropped && _this3.props.item.dropTarget;
+	        },
+	        ondrop: function ondrop(event) {
+	          if (_this3.props.onItemDrop) {
+	            _this3.props.onItemDrop(_this3.props.item);
+	          }
+	          event.target.classList.remove('selected');
+	        },
+	        ondropmove: function ondropmove(event) {
+	          event.target.classList.add("selected");
+	        },
+	        ondragleave: function ondragleave(event) {
+	          event.target.classList.remove('selected');
+	        }
+	      });
 	    }
 	  }, {
 	    key: 'actualClick',
@@ -1805,6 +1883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        height: dimensions.height + 'px',
 	        lineHeight: dimensions.height + 'px'
 	      };
+	      console.log(style);
 	
 	      return _react2.default.createElement(
 	        'div',
@@ -2036,7 +2115,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var x = isDragging ? dragTime : itemStart;
 	
 	  var w = Math.max(itemEnd - itemStart, dragSnap);
-	
+	  console.log(itemEnd);
+	  console.log(itemStart);
+	  console.log(w);
 	  var collisionX = itemStart;
 	  var collisionW = w;
 	
@@ -2489,7 +2570,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _interact = __webpack_require__(10);
+	
+	var _interact2 = _interopRequireDefault(_interact);
+	
 	var _utils = __webpack_require__(11);
+	
+	var _Group = __webpack_require__(16);
+	
+	var _Group2 = _interopRequireDefault(_Group);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2521,7 +2610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return true;
 	      }
 	
-	      return !((0, _utils.arraysEqual)(nextProps.groups, this.props.groups) && nextProps.keys === this.props.keys && nextProps.width === this.props.width && nextProps.lineHeight === this.props.lineHeight && nextProps.fixedHeader === this.props.fixedHeader && nextProps.zIndex === this.props.zIndex && nextProps.groupHeights === this.props.groupHeights && nextProps.height === this.props.height);
+	      return !((0, _utils.arraysEqual)(nextProps.groups, this.props.groups) && nextProps.keys === this.props.keys && nextProps.width === this.props.width && nextProps.lineHeight === this.props.lineHeight && nextProps.fixedHeader === this.props.fixedHeader && nextProps.zIndex === this.props.zIndex && nextProps.groupHeights === this.props.groupHeights && nextProps.groups === this.props.groups && nextProps.height === this.props.height);
 	    }
 	  }, {
 	    key: 'scroll',
@@ -2585,6 +2674,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	      var sidebarStyle = {
+	        left: '0px',
+	        position: 'absolute',
 	        width: width + 'px',
 	        height: height + 'px'
 	      };
@@ -2598,7 +2689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var groupsStyle = {
 	        width: width + 'px'
 	      };
-	
+	      console.log("zIndex:", zIndex);
 	      if (fixedHeader === 'fixed') {
 	        headerStyle.position = 'fixed';
 	        headerStyle.zIndex = zIndex;
@@ -2621,20 +2712,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var groupLines = [];
 	      var i = 0;
+	      var lineCount = (0, _utils._length)(groups);
+	      var totalHeight = headerHeight;
 	
-	      this.props.groups.forEach(function (group, index) {
+	      for (var _i = 0; _i < lineCount; _i++) {
+	        var group = (0, _utils._get)(groups, _i);
 	        var elementStyle = {
-	          height: groupHeights[index] - 1 + 'px',
-	          lineHeight: groupHeights[index] - 1 + 'px'
+	          position: 'absolute',
+	          left: '0px',
+	          top: totalHeight + 'px',
+	          height: groupHeights[_i] - 1 + 'px',
+	          lineHeight: groupHeights[_i] - 1 + 'px',
+	          width: width + 'px'
 	        };
-	
-	        groupLines.push(_react2.default.createElement(
-	          'div',
-	          { key: (0, _utils._get)(group, groupIdKey), className: 'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd'), style: elementStyle },
-	          (0, _utils._get)(group, groupTitleKey)
-	        ));
-	        i += 1;
-	      });
+	        groupLines.push(_react2.default.createElement(_Group2.default, {
+	          keys: this.props.keys,
+	          key: "sideBar" + (0, _utils._get)(group, groupIdKey),
+	          className: 'rct-sidebar-row' + (_i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd') + ((0, _utils._get)(group, "dropTarget") ? ' rct-sidebar-droptarget' : ' '),
+	          style: elementStyle,
+	          onDrop: this.props.onGroupDrop,
+	          onContextMenu: this.props.onGroupContextMenu,
+	          onSelect: this.props.onSelect,
+	          canSelect: (0, _utils._get)(group, 'canSelect') !== undefined ? (0, _utils._get)(group, 'canSelect') : this.props.canSelect,
+	          group: group }));
+	        totalHeight += groupHeights[_i];
+	      }
 	
 	      return _react2.default.createElement(
 	        'div',
@@ -2652,6 +2754,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Sidebar;
 	}(_react.Component);
 	
+	Sidebar.propTypes = {
+	  //canSelect: PropTypes.bool,
+	};
+	Sidebar.defaultProps = {};
 	exports.default = Sidebar;
 	
 	
@@ -2672,6 +2778,197 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _interact = __webpack_require__(10);
+	
+	var _interact2 = _interopRequireDefault(_interact);
+	
+	var _moment = __webpack_require__(3);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
+	var _utils = __webpack_require__(11);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Group = function (_Component) {
+	  _inherits(Group, _Component);
+	
+	  function Group(props) {
+	    _classCallCheck(this, Group);
+	
+	    var _this = _possibleConstructorReturn(this, (Group.__proto__ || Object.getPrototypeOf(Group)).call(this, props));
+	
+	    _this.handleContextMenu = function (e) {
+	      if (_this.props.onContextMenu) {
+	        e.preventDefault();
+	        e.stopPropagation();
+	        _this.props.onContextMenu(_this.group, e);
+	      }
+	    };
+	
+	    _this.onMouseDown = function (e) {
+	      if (!_this.state.interactMounted) {
+	        e.preventDefault();
+	        _this.startedClicking = true;
+	      }
+	    };
+	
+	    _this.onMouseUp = function (e) {
+	      if (!_this.state.interactMounted && _this.startedClicking) {
+	        _this.startedClicking = false;
+	        _this.actualClick(e, 'click');
+	      }
+	    };
+	
+	    _this.onTouchStart = function (e) {
+	      if (!_this.state.interactMounted) {
+	        e.preventDefault();
+	        _this.startedTouching = true;
+	      }
+	    };
+	
+	    _this.onTouchEnd = function (e) {
+	      if (!_this.state.interactMounted && _this.startedTouching) {
+	        _this.startedTouching = false;
+	        _this.actualClick(e, 'touch');
+	      }
+	    };
+	
+	    _this.state = {
+	      interactMounted: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(Group, [{
+	    key: 'cacheDataFromProps',
+	    value: function cacheDataFromProps(props) {
+	      this.group = props.group;
+	      this.groupTitle = (0, _utils._get)(props.group, props.keys.groupTitleKey);
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      this.cacheDataFromProps(nextProps);
+	
+	      var interactMounted = this.state.interactMounted;
+	
+	
+	      if (!interactMounted) {
+	        this.mountInteract();
+	      }
+	    }
+	  }, {
+	    key: 'mountInteract',
+	    value: function mountInteract() {
+	      var _this2 = this;
+	
+	      (0, _interact2.default)(this.refs.group).draggable(false).resizable(false).gesturable(false).dropzone({
+	        accept: '.draggable',
+	        checker: function checker(dragEvent, // related dragmove or dragend
+	        event, // Touch, Pointer or Mouse Event
+	        dropped, // bool default checker result
+	        dropzone, // dropzone Interactable
+	        dropElement, // dropzone elemnt
+	        draggable, // draggable Interactable
+	        draggableElement) {
+	          // draggable element
+	          return dropped && _this2.props.group.dropTarget;
+	        },
+	        ondrop: function ondrop(event) {
+	          if (_this2.props.onDrop) {
+	            _this2.props.onDrop(_this2.props.group);
+	          }
+	          event.target.classList.remove('selected');
+	        },
+	        ondropmove: function ondropmove(event) {
+	          event.target.classList.add("selected");
+	        },
+	        ondragleave: function ondragleave(event) {
+	          event.target.classList.remove('selected');
+	        }
+	      }).on('tap', function (e) {
+	        _this2.actualClick(e, e.pointerType === 'mouse' ? 'click' : 'touch');
+	      });
+	      this.setState({
+	        interactMounted: true
+	      });
+	    }
+	  }, {
+	    key: 'actualClick',
+	    value: function actualClick(e, clickType) {
+	      if (this.props.canSelect && this.props.onSelect) {
+	        this.props.onSelect(this.group, clickType, e);
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          group = _props.group,
+	          className = _props.className,
+	          style = _props.style;
+	      var _props$keys = this.props.keys,
+	          groupIdKey = _props$keys.groupIdKey,
+	          groupTitleKey = _props$keys.groupTitleKey;
+	
+	
+	      var classNames = className + (group.dropTarget ? ' dropTarget' : ' ');
+	
+	      return _react2.default.createElement(
+	        'div',
+	        _extends({}, this.props.group.groupProps, {
+	          key: (0, _utils._get)(group, groupIdKey),
+	          ref: 'group',
+	          className: classNames, style: style,
+	          onContextMenu: this.handleContextMenu,
+	          onMouseDown: this.onMouseDown,
+	          onMouseUp: this.onMouseUp,
+	          onTouchStart: this.onTouchStart,
+	          onTouchEnd: this.onTouchEnd }),
+	        (0, _utils._get)(group, groupTitleKey)
+	      );
+	    }
+	  }]);
+	
+	  return Group;
+	}(_react.Component);
+	
+	Group.propTypes = {
+	  group: _react2.default.PropTypes.object.isRequired,
+	  onSelect: _react2.default.PropTypes.func,
+	  onDrop: _react2.default.PropTypes.func,
+	  onContextMenu: _react2.default.PropTypes.func
+	};
+	Group.defaultProps = {
+	  selected: false
+	};
+	exports.default = Group;
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2982,7 +3279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3089,7 +3386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3103,6 +3400,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _react = __webpack_require__(2);
 	
 	var _react2 = _interopRequireDefault(_react);
+	
+	var _HorizontalLine = __webpack_require__(20);
+	
+	var _HorizontalLine2 = _interopRequireDefault(_HorizontalLine);
+	
+	var _utils = __webpack_require__(11);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -3130,23 +3433,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'render',
 	    value: function render() {
 	      var _props = this.props,
-	          lineCount = _props.lineCount,
+	          groups = _props.groups,
 	          canvasWidth = _props.canvasWidth,
 	          groupHeights = _props.groupHeights,
 	          headerHeight = _props.headerHeight;
 	
 	      var lines = [];
-	
+	      var lineCount = (0, _utils._length)(groups);
 	      var totalHeight = headerHeight;
 	      for (var i = 0; i < lineCount; i++) {
-	        lines.push(_react2.default.createElement('div', { key: 'horizontal-line-' + i,
+	        var group = (0, _utils._get)(groups, i);
+	
+	        var elementStyle = {
+	          top: totalHeight + 'px',
+	          left: '0px',
+	          width: canvasWidth + 'px',
+	          height: groupHeights[i] - 1 + 'px',
+	          lineHeight: groupHeights[i] - 1 + 'px',
+	          opacity: 0.99
+	        };
+	        lines.push(_react2.default.createElement(_HorizontalLine2.default, {
+	          keys: this.props.keys,
+	          key: 'horizontal-line-' + i,
 	          className: i % 2 === 0 ? 'rct-hl-even' : 'rct-hl-odd',
-	          style: {
-	            top: totalHeight + 'px',
-	            left: '0px',
-	            width: canvasWidth + 'px',
-	            height: groupHeights[i] - 1 + 'px'
-	          } }));
+	          group: group,
+	          style: elementStyle,
+	          onDrop: this.props.onGroupTimelineDrop,
+	          onContextMenu: this.props.onGroupTimelineContextMenu,
+	          onSelect: this.props.onGroupTimelineSelect,
+	          canSelect: (0, _utils._get)(group, 'canSelect') !== undefined ? (0, _utils._get)(group, 'canSelect') : this.props.canSelect
+	        }));
 	        totalHeight += groupHeights[i];
 	      }
 	
@@ -3165,16 +3481,176 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	HorizontalLines.propTypes = {
+	  groups: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object).isRequired,
 	  canvasWidth: _react2.default.PropTypes.number.isRequired,
-	  lineHeight: _react2.default.PropTypes.number.isRequired,
-	  lineCount: _react2.default.PropTypes.number.isRequired
+	  lineHeight: _react2.default.PropTypes.number.isRequired
 	};
 	HorizontalLines.defaultProps = {
 	  borderWidth: 1
 	};
 
 /***/ },
-/* 19 */
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _utils = __webpack_require__(11);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var HorizontalLine = function (_Component) {
+	  _inherits(HorizontalLine, _Component);
+	
+	  function HorizontalLine(props) {
+	    _classCallCheck(this, HorizontalLine);
+	
+	    var _this = _possibleConstructorReturn(this, (HorizontalLine.__proto__ || Object.getPrototypeOf(HorizontalLine)).call(this, props));
+	
+	    _this.handleContextMenu = function (e) {
+	      if (_this.props.onContextMenu) {
+	        e.preventDefault();
+	        e.stopPropagation();
+	        _this.props.onContextMenu(_this.group, e);
+	      }
+	    };
+	
+	    _this.onMouseDown = function (e) {
+	      if (!_this.state.interactMounted) {
+	        e.preventDefault();
+	        _this.startedClicking = true;
+	      }
+	    };
+	
+	    _this.onMouseUp = function (e) {
+	      if (!_this.state.interactMounted && _this.startedClicking) {
+	        _this.startedClicking = false;
+	        _this.actualClick(e, 'click');
+	      }
+	    };
+	
+	    _this.onTouchStart = function (e) {
+	      if (!_this.state.interactMounted) {
+	        e.preventDefault();
+	        _this.startedTouching = true;
+	      }
+	    };
+	
+	    _this.onTouchEnd = function (e) {
+	      if (!_this.state.interactMounted && _this.startedTouching) {
+	        _this.startedTouching = false;
+	        _this.actualClick(e, 'touch');
+	      }
+	    };
+	
+	    _this.state = {
+	      interactMounted: false
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(HorizontalLine, [{
+	    key: 'cacheDataFromProps',
+	    value: function cacheDataFromProps(props) {
+	      this.group = props.group;
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      this.cacheDataFromProps(nextProps);
+	      var interactMounted = this.state.interactMounted;
+	
+	
+	      if (!interactMounted) {
+	        this.mountInteract();
+	      }
+	    }
+	  }, {
+	    key: 'mountInteract',
+	    value: function mountInteract() {
+	      var _this2 = this;
+	
+	      console.log("NMount");
+	      interact(this.refs.hline).draggable(false).resizable(false).gesturable(false).dropzone({
+	        accept: '.draggable',
+	        ondrop: function ondrop(event) {
+	          if (_this2.props.onDrop) {
+	            _this2.props.onDrop(_this2.props.group);
+	          }
+	          event.target.classList.remove('selected');
+	        },
+	        ondropmove: function ondropmove(event) {
+	          event.target.classList.add("selected");
+	        },
+	        ondragleave: function ondragleave(event) {
+	          event.target.classList.remove('selected');
+	        }
+	      }).on('tap', function (e) {
+	        _this2.actualClick(e, e.pointerType === 'mouse' ? 'click' : 'touch');
+	      });
+	      this.setState({
+	        interactMounted: true
+	      });
+	    }
+	  }, {
+	    key: 'actualClick',
+	    value: function actualClick(e, clickType) {
+	      if (this.props.canSelect && this.props.onSelect) {
+	        this.props.onSelect(this.group, clickType, e);
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement('div', { ref: 'hline',
+	        className: this.props.className,
+	        style: this.props.style,
+	        onContextMenu: this.handleContextMenu,
+	        onMouseDown: this.onMouseDown,
+	        onMouseUp: this.onMouseUp,
+	        onTouchStart: this.onTouchStart,
+	        onTouchEnd: this.onTouchEnd
+	      });
+	    }
+	  }]);
+	
+	  return HorizontalLine;
+	}(_react.Component);
+	
+	exports.default = HorizontalLine;
+	
+	
+	HorizontalLine.propTypes = {
+	  group: _react2.default.PropTypes.object.isRequired,
+	  onSelect: _react2.default.PropTypes.func,
+	  onDrop: _react2.default.PropTypes.func,
+	  onContextMenu: _react2.default.PropTypes.func
+	};
+	
+	HorizontalLine.defaultProps = {
+	  borderWidth: 1,
+	  selected: false
+	
+	};
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
