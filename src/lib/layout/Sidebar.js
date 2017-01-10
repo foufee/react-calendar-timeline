@@ -80,7 +80,7 @@ export default class Sidebar extends Component {
     } = this.props
 
     const {groupIdKey, groupTitleKey} = this.props.keys
-
+    const groups = this.props.groups;
     const {
       scrollTop
     } = this.state
