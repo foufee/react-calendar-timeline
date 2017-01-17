@@ -217,9 +217,10 @@ export default class Item extends Component {
           let dragGroupDelta = this.dragGroupDelta(e)
 
           if (this.props.moveResizeValidator) {
-            dragTime = this.props.moveResizeValidator('move', this.props.item, dragTime)
+            let {newDragTime, newGroup} = this.props.moveResizeValidator('move', this.props.item, dragTime, undefined, this.props.order + dragGroupDelta)
+            dragTime = newDragTime;
+            dragGroupDelta = newGroup - this.props.order;
           }
-
           if (this.props.onDrag) {
             this.props.onDrag(this.itemId, dragTime, this.props.order + dragGroupDelta)
           }
@@ -234,12 +235,15 @@ export default class Item extends Component {
         if (this.state.dragging) {
           if (this.props.onDrop) {
             let dragTime = this.dragTime(e)
+            let dragGroupDelta = this.dragGroupDelta(e)
 
             if (this.props.moveResizeValidator) {
-              dragTime = this.props.moveResizeValidator('move', this.props.item, dragTime)
+              let {newDragTime, newGroup} = this.props.moveResizeValidator('move', this.props.item, dragTime, undefined, this.props.order + dragGroupDelta)
+              dragTime = newDragTime;
+              dragGroupDelta = newGroup - this.props.order;
             }
 
-            this.props.onDrop(this.itemId, dragTime, this.props.order + this.dragGroupDelta(e))
+            this.props.onDrop(this.props.item, dragTime, this.props.order + dragGroupDelta)
           }
 
           this.setState({
