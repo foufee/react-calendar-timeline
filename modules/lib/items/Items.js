@@ -127,7 +127,10 @@ var Items = function (_Component) {
             onDrop: _this2.props.itemDrop,
             onItemDoubleClick: _this2.props.onItemDoubleClick,
             onContextMenu: _this2.props.onItemContextMenu,
-            onSelect: _this2.props.itemSelect });
+            onSelect: _this2.props.itemSelect,
+            onItemDrop: _this2.props.onItemDrop
+
+          });
         })
       );
     }

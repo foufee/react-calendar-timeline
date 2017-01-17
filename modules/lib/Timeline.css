@@ -6,7 +6,7 @@
 .react-calendar-timeline .rct-scroll {
   display: inline-block;
   vertical-align: top;
-  overflow-x: scroll;
+  overflow-x: hidden;
   overflow-y: hidden;
   -ms-touch-action: none;
   touch-action: none; }
@@ -137,6 +137,10 @@
     box-sizing: content-box;
     margin: 0;
     border-bottom: 1px solid #bbb; }
+    .react-calendar-timeline .rct-sidebar .rct-sidebar-row.selected {
+      background: black;
+      border: 1px solid #FF9800;
+      z-index: 2; }
     .react-calendar-timeline .rct-sidebar .rct-sidebar-row.rct-sidebar-row-odd {
       background: rgba(0, 0, 0, 0.05); }
     .react-calendar-timeline .rct-sidebar .rct-sidebar-row.rct-sidebar-row-even {
@@ -147,8 +151,14 @@
   position: absolute; }
 .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
   background: rgba(0, 0, 0, 0.05); }
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd.selected {
+    border: 1px solid #FF9800;
+    z-index: 2; }
 .react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
   background: transparent; }
+  .react-calendar-timeline .rct-horizontal-lines .rct-hl-even.selected {
+    border: 1px solid #FF9800;
+    z-index: 2; }
 .react-calendar-timeline .rct-vertical-lines .rct-vl {
   position: absolute;
   border-left: 1px solid #bbb;

@@ -217,6 +217,11 @@ var Header = function (_Component) {
         })();
       }
 
+      var delta = timeSteps[minUnit];
+      var leftTime = (0, _moment2.default)(visibleTimeStart).startOf(minUnit);
+      var value = leftTime.get(minUnit);
+      leftTime.set(minUnit, value - value % timeSteps[minUnit]);
+
       (0, _utils.iterateTimes)(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps, function (time, nextTime) {
         var left = Math.round((time.valueOf() - canvasTimeStart) * ratio, -2);
         var minUnitValue = time.get(minUnit === 'day' ? 'date' : minUnit);
@@ -225,24 +230,26 @@ var Header = function (_Component) {
         var borderWidth = firstOfType ? 2 : 1;
         var leftCorrect = fixedHeader === 'fixed' ? Math.round((canvasTimeStart - visibleTimeStart) * ratio) - borderWidth + 1 : 0;
 
-        timeLabels.push(_react2.default.createElement(
-          'div',
-          { key: 'label-' + time.valueOf(),
-            href: '#',
-            className: 'rct-label ' + (twoHeaders ? '' : 'rct-label-only') + ' ' + (firstOfType ? 'rct-first-of-type' : '') + ' ',
-            'data-time': time,
-            'data-unit': minUnit,
-            style: {
-              top: (minUnit === 'year' ? 0 : headerLabelGroupHeight) + 'px',
-              left: left + leftCorrect + 'px',
-              width: labelWidth + 'px',
-              height: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
-              lineHeight: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
-              fontSize: (labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10') + 'px',
-              cursor: 'pointer'
-            } },
-          _this3.subHeaderLabel(time, minUnit, labelWidth)
-        ));
+        if (time.valueOf() <= visibleTimeEnd && time.valueOf() >= leftTime || true) {
+          timeLabels.push(_react2.default.createElement(
+            'div',
+            { key: 'label-' + time.valueOf(),
+              href: '#',
+              className: 'rct-label ' + (twoHeaders ? '' : 'rct-label-only') + ' ' + (firstOfType ? 'rct-first-of-type' : '') + ' ',
+              'data-time': time,
+              'data-unit': minUnit,
+              style: {
+                top: (minUnit === 'year' ? 0 : headerLabelGroupHeight) + 'px',
+                left: left + leftCorrect + 'px',
+                width: labelWidth + 'px',
+                height: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
+                lineHeight: (minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight) + 'px',
+                fontSize: (labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10') + 'px',
+                cursor: 'pointer'
+              } },
+            _this3.subHeaderLabel(time, minUnit, labelWidth)
+          ));
+        }
       });
 
       var zIndex = this.props.zIndex;

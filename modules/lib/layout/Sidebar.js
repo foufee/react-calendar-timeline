@@ -10,7 +10,15 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _interact = require('interact.js');
+
+var _interact2 = _interopRequireDefault(_interact);
+
 var _utils = require('../utils');
+
+var _Group = require('./Group');
+
+var _Group2 = _interopRequireDefault(_Group);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42,7 +50,7 @@ var Sidebar = function (_Component) {
         return true;
       }
 
-      return !((0, _utils.arraysEqual)(nextProps.groups, this.props.groups) && nextProps.keys === this.props.keys && nextProps.width === this.props.width && nextProps.lineHeight === this.props.lineHeight && nextProps.fixedHeader === this.props.fixedHeader && nextProps.zIndex === this.props.zIndex && nextProps.groupHeights === this.props.groupHeights && nextProps.height === this.props.height);
+      return !((0, _utils.arraysEqual)(nextProps.groups, this.props.groups) && nextProps.keys === this.props.keys && nextProps.width === this.props.width && nextProps.lineHeight === this.props.lineHeight && nextProps.fixedHeader === this.props.fixedHeader && nextProps.zIndex === this.props.zIndex && nextProps.groupHeights === this.props.groupHeights && nextProps.groups === this.props.groups && nextProps.height === this.props.height);
     }
   }, {
     key: 'scroll',
@@ -106,6 +114,7 @@ var Sidebar = function (_Component) {
 
 
       var sidebarStyle = {
+        left: '0px',
         width: width + 'px',
         height: height + 'px'
       };
@@ -119,7 +128,6 @@ var Sidebar = function (_Component) {
       var groupsStyle = {
         width: width + 'px'
       };
-
       if (fixedHeader === 'fixed') {
         headerStyle.position = 'fixed';
         headerStyle.zIndex = zIndex;
@@ -142,20 +150,30 @@ var Sidebar = function (_Component) {
 
       var groupLines = [];
       var i = 0;
+      var lineCount = (0, _utils._length)(this.props.groups);
+      var totalHeight = headerHeight;
 
-      this.props.groups.forEach(function (group, index) {
+      for (var _i = 0; _i < lineCount; _i++) {
+        var group = (0, _utils._get)(this.props.groups, _i);
         var elementStyle = {
-          height: groupHeights[index] - 1 + 'px',
-          lineHeight: groupHeights[index] - 1 + 'px'
+          left: '0px',
+          top: totalHeight + 'px',
+          height: groupHeights[_i] - 1 + 'px',
+          lineHeight: groupHeights[_i] - 1 + 'px',
+          width: width + 'px'
         };
-
-        groupLines.push(_react2.default.createElement(
-          'div',
-          { key: (0, _utils._get)(group, groupIdKey), className: 'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd'), style: elementStyle },
-          (0, _utils._get)(group, groupTitleKey)
-        ));
-        i += 1;
-      });
+        groupLines.push(_react2.default.createElement(_Group2.default, {
+          keys: this.props.keys,
+          key: "sideBar" + (0, _utils._get)(group, groupIdKey),
+          className: 'rct-sidebar-row' + (_i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd') + ((0, _utils._get)(group, "dropTarget") ? ' rct-sidebar-droptarget' : ' '),
+          style: elementStyle,
+          onDrop: this.props.onGroupDrop,
+          onContextMenu: this.props.onGroupContextMenu,
+          onSelect: this.props.onSelect,
+          canSelect: (0, _utils._get)(group, 'canSelect') !== undefined ? (0, _utils._get)(group, 'canSelect') : this.props.canSelect,
+          group: group }));
+        totalHeight += groupHeights[_i];
+      }
 
       return _react2.default.createElement(
         'div',
@@ -173,6 +191,10 @@ var Sidebar = function (_Component) {
   return Sidebar;
 }(_react.Component);
 
+Sidebar.propTypes = {
+  //canSelect: PropTypes.bool,
+};
+Sidebar.defaultProps = {};
 exports.default = Sidebar;
 
 

@@ -123,6 +123,7 @@ var ReactCalendarTimeline = function (_Component) {
       canvasTimeStart: visibleTimeStart - (visibleTimeEnd - visibleTimeStart),
 
       selectedItem: null,
+      selectedGroup: null,
       dragTime: null,
       dragGroupTitle: null,
       resizeTime: null,
@@ -284,7 +285,6 @@ var ReactCalendarTimeline = function (_Component) {
       var row = Math.floor((y - lineHeight * 2) / lineHeight);
       var time = Math.round(visibleTimeStart + x / width * (visibleTimeEnd - visibleTimeStart));
       time = Math.floor(time / dragSnap) * dragSnap;
-
       return [row, time];
     }
   }, {
@@ -316,13 +316,20 @@ var ReactCalendarTimeline = function (_Component) {
     }
   }, {
     key: 'horizontalLines',
-    value: function horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight) {
-      return _react2.default.createElement(_HorizontalLines2.default, { canvasWidth: canvasWidth,
+    value: function horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap) {
+      return _react2.default.createElement(_HorizontalLines2.default, { canvasTimeStart: canvasTimeStart,
+        canvasTimeEnd: canvasTimeEnd,
+        canvasWidth: canvasWidth,
+        dragSnap: dragSnap,
+        keys: this.props.keys,
         lineHeight: this.props.lineHeight,
-        lineCount: (0, _utils._length)(this.props.groups),
         groups: this.props.groups,
         groupHeights: groupHeights,
-        headerHeight: headerHeight
+        headerHeight: headerHeight,
+        canSelect: this.props.canSelectGroups,
+        groupTimelineDrag: this.dragOnGroupTimeline,
+        onGroupTimelineDrop: this.props.onGroupTimelineDrop,
+        onGroupTimelineContextMenu: this.props.onGroupTimelineContextMenu
       });
     }
   }, {
@@ -341,6 +348,7 @@ var ReactCalendarTimeline = function (_Component) {
         groups: this.props.groups,
         keys: this.props.keys,
         selectedItem: this.state.selectedItem,
+        selectedGroup: this.state.selectedGroup,
         dragSnap: this.props.dragSnap,
         minResizeWidth: this.props.minResizeWidth,
         canChangeGroup: this.props.canChangeGroup,
@@ -348,13 +356,14 @@ var ReactCalendarTimeline = function (_Component) {
         canResize: this.props.canResize,
         useResizeHandle: this.props.useResizeHandle,
         canSelect: this.props.canSelect,
-        moveResizeValidator: this.props.moveResizeValidator,
+        moveResizeValidator: this.moveResizeValidator,
         topOffset: this.state.topOffset,
         itemSelect: this.selectItem,
         itemDrag: this.dragItem,
         itemDrop: this.dropItem,
         onItemDoubleClick: this.props.onItemDoubleClick,
         onItemContextMenu: this.props.onItemContextMenu,
+        onItemDrop: this.props.onItemDrop,
         itemResizing: this.resizingItem,
         itemResized: this.resizedItem });
     }
@@ -368,7 +377,6 @@ var ReactCalendarTimeline = function (_Component) {
       } else if (this.state.resizeTime) {
         label = (0, _moment2.default)(this.state.resizeTime).format('LLL');
       }
-
       return label ? _react2.default.createElement(_InfoLabel2.default, { label: label }) : '';
     }
   }, {
@@ -397,14 +405,16 @@ var ReactCalendarTimeline = function (_Component) {
         _Sidebar2.default,
         { groups: this.props.groups,
           keys: this.props.keys,
-
           width: this.props.sidebarWidth,
           lineHeight: this.props.lineHeight,
           groupHeights: groupHeights,
           height: height,
           headerHeight: headerHeight,
-
           fixedHeader: this.props.fixedHeader,
+          canSelect: this.props.canSelectGroups,
+          onSelect: this.selectGroup,
+          onGroupDrop: this.props.onGroupDrop,
+          onGroupContextMenu: this.props.onGroupContextMenu,
           zIndex: this.props.zIndexStart + 2 },
         this.props.children
       );
@@ -483,7 +493,8 @@ var ReactCalendarTimeline = function (_Component) {
           headerLabelGroupHeight = _props4.headerLabelGroupHeight,
           headerLabelHeight = _props4.headerLabelHeight,
           sidebarWidth = _props4.sidebarWidth,
-          timeSteps = _props4.timeSteps;
+          timeSteps = _props4.timeSteps,
+          dragSnap = _props4.dragSnap;
       var _state4 = this.state,
           draggingItem = _state4.draggingItem,
           resizingItem = _state4.resizingItem,
@@ -552,12 +563,12 @@ var ReactCalendarTimeline = function (_Component) {
                 style: canvasComponentStyle,
                 onDoubleClick: this.handleDoubleClick
               },
-              this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops),
               this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight),
-              this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight),
+              this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap),
               this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight),
               this.infoLabel(),
-              this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight)
+              this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight),
+              this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)
             )
           )
         )
@@ -592,12 +603,14 @@ ReactCalendarTimeline.propTypes = {
   canResize: _react.PropTypes.oneOf([true, false, 'left', 'right', 'both']),
   useResizeHandle: _react.PropTypes.bool,
   canSelect: _react.PropTypes.bool,
+  canSelectGroups: _react.PropTypes.bool,
 
   stackItems: _react.PropTypes.bool,
 
   traditionalZoom: _react.PropTypes.bool,
 
   itemTouchSendsClick: _react.PropTypes.bool,
+  groupTouchSendsClick: _react.PropTypes.bool,
 
   onItemMove: _react.PropTypes.func,
   onItemResize: _react.PropTypes.func,
@@ -606,7 +619,13 @@ ReactCalendarTimeline.propTypes = {
   onCanvasClick: _react.PropTypes.func,
   onItemDoubleClick: _react.PropTypes.func,
   onItemContextMenu: _react.PropTypes.func,
+  onItemDrop: _react.PropTypes.func,
   onCanvasDoubleClick: _react.PropTypes.func,
+
+  onGroupClick: _react.PropTypes.func,
+  onGroupSelect: _react.PropTypes.func,
+  onGroupDrop: _react.PropTypes.func,
+  onGroupContextMenu: _react.PropTypes.func,
 
   moveResizeValidator: _react.PropTypes.func,
 
@@ -650,6 +669,7 @@ ReactCalendarTimeline.defaultProps = {
   canResize: 'right',
   useResizeHandle: false,
   canSelect: true,
+  canSelectGroups: false,
 
   stackItems: false,
 
@@ -663,6 +683,11 @@ ReactCalendarTimeline.defaultProps = {
   onItemDoubleClick: null,
   onItemContextMenu: null,
 
+  onGroupClick: null,
+  onGroupSelect: null,
+  onGroupDrop: null,
+  onGroupContextMenu: null,
+
   moveResizeValidator: null,
 
   dayBackground: null,
@@ -671,6 +696,7 @@ ReactCalendarTimeline.defaultProps = {
   defaultTimeEnd: null,
 
   itemTouchSendsClick: false,
+  groupTouchSendsClick: false,
 
   style: {},
   keys: defaultKeys,
@@ -924,6 +950,19 @@ var _initialiseProps = function _initialiseProps() {
     }
   };
 
+  this.selectGroup = function (group, clickType, e) {
+    if (_this3.state.selectedGroup === group || _this3.props.groupTouchSendsClick && clickType === 'touch') {
+      if (group && _this3.props.onGroupClick) {
+        _this3.props.onGroupClick(group, e);
+      }
+    } else {
+      _this3.setState({ selectedGroup: group });
+      if (group && _this3.props.onGroupSelect) {
+        _this3.props.onGroupSelect(group, e);
+      }
+    }
+  };
+
   this.scrollAreaClick = function (e) {
     // if not clicking on an item
 
@@ -940,6 +979,11 @@ var _initialiseProps = function _initialiseProps() {
           var groupId = (0, _utils._get)(_this3.props.groups[row], _this3.props.keys.groupIdKey);
           _this3.props.onCanvasClick(groupId, time, e);
         }
+      }
+    }
+    if (!(0, _utils.hasSomeParentTheClass)(e.target, 'rct-sidebar')) {
+      if (_this3.state.selectedGroup) {
+        _this3.selectGroup(null);
       }
     }
   };
@@ -959,7 +1003,16 @@ var _initialiseProps = function _initialiseProps() {
   this.dropItem = function (item, dragTime, newGroupOrder) {
     _this3.setState({ draggingItem: null, dragTime: null, dragGroupTitle: null });
     if (_this3.props.onItemMove) {
-      _this3.props.onItemMove(item, dragTime, newGroupOrder);
+      console.log("DropItem:", item);
+      var group = _this3.props.groups[newGroupOrder];
+      _this3.props.onItemMove(item, dragTime, group);
+    }
+  };
+
+  this.moveResizeValidator = function (action, item, time, resizeEdge, newGroupId) {
+    if (_this3.props.moveResizeValidator) {
+      var group = _this3.props.groups[newGroupId];
+      return _this3.props.moveResizeValidator(action, item, time, resizeEdge, group);
     }
   };
 

@@ -272,9 +272,13 @@ var Item = function (_Component) {
           var dragGroupDelta = _this2.dragGroupDelta(e);
 
           if (_this2.props.moveResizeValidator) {
-            dragTime = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime);
-          }
+            var _props$moveResizeVali = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime, undefined, _this2.props.order + dragGroupDelta),
+                newDragTime = _props$moveResizeVali.newDragTime,
+                newGroup = _props$moveResizeVali.newGroup;
 
+            dragTime = newDragTime;
+            dragGroupDelta = newGroup - _this2.props.order;
+          }
           if (_this2.props.onDrag) {
             _this2.props.onDrag(_this2.itemId, dragTime, _this2.props.order + dragGroupDelta);
           }
@@ -288,12 +292,18 @@ var Item = function (_Component) {
         if (_this2.state.dragging) {
           if (_this2.props.onDrop) {
             var dragTime = _this2.dragTime(e);
+            var dragGroupDelta = _this2.dragGroupDelta(e);
 
             if (_this2.props.moveResizeValidator) {
-              dragTime = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime);
+              var _props$moveResizeVali2 = _this2.props.moveResizeValidator('move', _this2.props.item, dragTime, undefined, _this2.props.order + dragGroupDelta),
+                  newDragTime = _props$moveResizeVali2.newDragTime,
+                  newGroup = _props$moveResizeVali2.newGroup;
+
+              dragTime = newDragTime;
+              dragGroupDelta = newGroup - _this2.props.order;
             }
 
-            _this2.props.onDrop(_this2.itemId, dragTime, _this2.props.order + _this2.dragGroupDelta(e));
+            _this2.props.onDrop(_this2.props.item, dragTime, _this2.props.order + dragGroupDelta);
           }
 
           _this2.setState({
@@ -400,6 +410,8 @@ var Item = function (_Component) {
   }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
+      var _this3 = this;
+
       this.cacheDataFromProps(nextProps);
 
       var interactMounted = this.state.interactMounted;
@@ -433,6 +445,31 @@ var Item = function (_Component) {
       if (interactMounted && couldDrag !== willBeAbleToDrag) {
         (0, _interact2.default)(this.refs.item).draggable({ enabled: willBeAbleToDrag });
       }
+      (0, _interact2.default)(this.refs.item).dropzone({
+        accept: '.draggable',
+        checker: function checker(dragEvent, // related dragmove or dragend
+        event, // Touch, Pointer or Mouse Event
+        dropped, // bool default checker result
+        dropzone, // dropzone Interactable
+        dropElement, // dropzone elemnt
+        draggable, // draggable Interactable
+        draggableElement) {
+          // draggable element
+          return dropped && _this3.props.item.dropTarget;
+        },
+        ondrop: function ondrop(event) {
+          if (_this3.props.onItemDrop) {
+            _this3.props.onItemDrop(_this3.props.item);
+          }
+          event.target.classList.remove('selected');
+        },
+        ondropmove: function ondropmove(event) {
+          event.target.classList.add("selected");
+        },
+        ondragleave: function ondragleave(event) {
+          event.target.classList.remove('selected');
+        }
+      });
     }
   }, {
     key: 'actualClick',
