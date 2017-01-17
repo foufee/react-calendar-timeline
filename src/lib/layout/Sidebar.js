@@ -136,6 +136,10 @@ export default class Sidebar extends Component {
         width: `${width}px`
       }
       groupLines.push(
+        <div key={_get(group, groupIdKey)} className={'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd')} style={elementStyle}>
+          {_get(group, groupTitleKey)}
+        </div>
+          /*
         <Group
           keys={this.props.keys}
           key={ "sideBar" + _get(group, groupIdKey)}
@@ -146,6 +150,7 @@ export default class Sidebar extends Component {
           onSelect={this.props.onSelect}
           canSelect={_get(group, 'canSelect') !== undefined ? _get(group, 'canSelect') : this.props.canSelect}
           group={group}/>
+          */
       )
       totalHeight += groupHeights[i]
     }

@@ -40,6 +40,7 @@ export default class Group extends Component {
   }
 
   mountInteract () {
+    return;
     interact(this.refs.group)
       .draggable(false)
       .resizable(false)
@@ -120,6 +121,7 @@ export default class Group extends Component {
   }
 
   render() {
+    console.log(this.props)
     const {
       group,className, style
     } = this.props
@@ -129,6 +131,12 @@ export default class Group extends Component {
     const classNames = className +
       (group.dropTarget ? ' dropTarget' : ' ')
 
+    return (
+      <div key={_get(group, groupIdKey)} className={'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd')} style={style}>
+        {_get(group, groupTitleKey)}
+      </div>
+    )
+    /*
     return (
     <div {...this.props.group.groupProps}
          key={_get(group, groupIdKey)}
@@ -142,5 +150,6 @@ export default class Group extends Component {
         {_get(group, groupTitleKey)}
     </div>
     )
+    */
   }
 }

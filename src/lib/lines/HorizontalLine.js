@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { _get} from '../utils'
+import interact from 'interact.js';
 
 export default class HorizontalLine extends Component {
   constructor (props) {
