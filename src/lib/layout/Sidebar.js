@@ -87,7 +87,6 @@ export default class Sidebar extends Component {
 
     const sidebarStyle = {
       left: '0px',
-      position: 'absolute',
       width: `${width}px`,
       height: `${height}px`
     }
@@ -101,7 +100,6 @@ export default class Sidebar extends Component {
     const groupsStyle = {
       width: `${width}px`
     }
-    console.log("zIndex:",zIndex)
     if (fixedHeader === 'fixed') {
       headerStyle.position = 'fixed'
       headerStyle.zIndex = zIndex
@@ -122,13 +120,12 @@ export default class Sidebar extends Component {
 
     let groupLines = []
     let i = 0
-    let lineCount = _length(groups)
+    let lineCount = _length(this.props.groups)
     let totalHeight = headerHeight
 
     for (let i = 0; i < lineCount; i++) {
-      let group = _get(groups,i)
+      let group = _get(this.props.groups,i)
       const elementStyle = {
-        position: 'absolute',
         left: '0px',
         top: `${totalHeight}px`,
         height: `${groupHeights[i] - 1}px`,
@@ -136,10 +133,6 @@ export default class Sidebar extends Component {
         width: `${width}px`
       }
       groupLines.push(
-        <div key={_get(group, groupIdKey)} className={'rct-sidebar-row' + (i % 2 === 0 ? ' rct-sidebar-row-even' : ' rct-sidebar-row-odd')} style={elementStyle}>
-          {_get(group, groupTitleKey)}
-        </div>
-          /*
         <Group
           keys={this.props.keys}
           key={ "sideBar" + _get(group, groupIdKey)}
@@ -150,7 +143,7 @@ export default class Sidebar extends Component {
           onSelect={this.props.onSelect}
           canSelect={_get(group, 'canSelect') !== undefined ? _get(group, 'canSelect') : this.props.canSelect}
           group={group}/>
-          */
+
       )
       totalHeight += groupHeights[i]
     }

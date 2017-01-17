@@ -29,6 +29,10 @@ export default class HorizontalLines extends Component {
       lines.push(
 
         <HorizontalLine
+          canvasTimeStart={this.props.canvasTimeStart}
+          canvasTimeEnd={this.props.canvasTimeEnd}
+          canvasWidth={this.props.canvasWidth}
+          dragSnap={this.props.dragSnap}
           keys={this.props.keys}
           key={`horizontal-line-${i}`}
           className={i % 2 === 0 ? 'rct-hl-even' : 'rct-hl-odd'}
@@ -51,6 +55,9 @@ export default class HorizontalLines extends Component {
 }
 
 HorizontalLines.propTypes = {
+  canvasTimeStart: React.PropTypes.number.isRequired,
+  canvasTimeEnd: React.PropTypes.number.isRequired,
+  canvasWidth: React.PropTypes.number.isRequired,
   groups: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   canvasWidth: React.PropTypes.number.isRequired,
   lineHeight: React.PropTypes.number.isRequired

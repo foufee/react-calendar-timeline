@@ -565,7 +565,6 @@ export default class ReactCalendarTimeline extends Component {
     const row = Math.floor((y - (lineHeight * 2)) / lineHeight)
     let time = Math.round(visibleTimeStart + x / width * (visibleTimeEnd - visibleTimeStart))
     time = Math.floor(time / dragSnap) * dragSnap
-
     return [row, time]
   }
 
@@ -605,7 +604,16 @@ export default class ReactCalendarTimeline extends Component {
   dropItem = (item, dragTime, newGroupOrder) => {
     this.setState({draggingItem: null, dragTime: null, dragGroupTitle: null})
     if (this.props.onItemMove) {
-      this.props.onItemMove(item, dragTime, newGroupOrder)
+      console.log("DropItem:",item)
+      let group = this.props.groups[newGroupOrder];
+      this.props.onItemMove(item, dragTime, group)
+    }
+  }
+
+  moveResizeValidator = (action,item,time,resizeEdge,newGroupId) => {
+    if (this.props.moveResizeValidator) {
+      let group = this.props.groups[newGroupId];
+      return this.props.moveResizeValidator(action, item, time, resizeEdge, group)
     }
   }
 
@@ -681,9 +689,12 @@ export default class ReactCalendarTimeline extends Component {
     )
   }
 
-  horizontalLines (canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight) {
+  horizontalLines (canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap) {
     return (
-      <HorizontalLines canvasWidth={canvasWidth}
+      <HorizontalLines canvasTimeStart={canvasTimeStart}
+                       canvasTimeEnd={canvasTimeEnd}
+                       canvasWidth={canvasWidth}
+                       dragSnap={dragSnap}
                        keys={this.props.keys}
                        lineHeight={this.props.lineHeight}
                        groups={this.props.groups}
@@ -720,7 +731,7 @@ export default class ReactCalendarTimeline extends Component {
              canResize={this.props.canResize}
              useResizeHandle={this.props.useResizeHandle}
              canSelect={this.props.canSelect}
-             moveResizeValidator={this.props.moveResizeValidator}
+             moveResizeValidator={this.moveResizeValidator}
              topOffset={this.state.topOffset}
              itemSelect={this.selectItem}
              itemDrag={this.dragItem}
@@ -741,7 +752,6 @@ export default class ReactCalendarTimeline extends Component {
     } else if (this.state.resizeTime) {
       label = moment(this.state.resizeTime).format('LLL')
     }
-
     return label ? <InfoLabel label={label} /> : ''
   }
 
@@ -863,7 +873,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   render () {
-    const { items, groups, headerLabelGroupHeight, headerLabelHeight, sidebarWidth, timeSteps } = this.props
+    const { items, groups, headerLabelGroupHeight, headerLabelHeight, sidebarWidth, timeSteps, dragSnap } = this.props
     const { draggingItem, resizingItem, isDragging, width, visibleTimeStart, visibleTimeEnd, canvasTimeStart } = this.state
     let { dimensionItems, height, groupHeights, groupTops } = this.state
     const zoom = visibleTimeEnd - visibleTimeStart
@@ -885,8 +895,6 @@ export default class ReactCalendarTimeline extends Component {
     }
 
     const scrollComponentStyle = {
-      position: 'absolute',
-      left: `${this.props.sidebarWidth}px`,
       width: `${width}px`,
       height: `${height + 20}px`,
       cursor: isDragging ? 'move' : 'default'
@@ -916,7 +924,7 @@ export default class ReactCalendarTimeline extends Component {
                  onDoubleClick={ this.handleDoubleClick }
             >
               {this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight)}
-              {this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight)}
+              {this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap)}
               {this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight)}
               {this.infoLabel()}
               {this.header(

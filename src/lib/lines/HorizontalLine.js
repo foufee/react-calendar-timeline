@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { _get} from '../utils'
 import interact from 'interact.js';
-
+import moment from 'moment';
 export default class HorizontalLine extends Component {
   constructor (props) {
     super(props)
@@ -23,6 +23,30 @@ export default class HorizontalLine extends Component {
     }
   }
 
+  dragTimeSnap (dragTime, considerOffset) {
+    const { dragSnap } = this.props
+    if (dragSnap) {
+      const offset = considerOffset ? moment().utcOffset() * 60 * 1000 : 0
+      return Math.round(dragTime / dragSnap) * dragSnap - offset % dragSnap
+    } else {
+      return dragTime
+    }
+  }
+
+  coordinateToTimeRatio (props = this.props) {
+    return (props.canvasTimeEnd - props.canvasTimeStart) / props.canvasWidth
+  }
+
+  dragTime (e) {
+    const { dragSnap } = this.props
+    const viewportOffset = this.refs.hline.getBoundingClientRect()
+    const x = e.pageX - viewportOffset.left
+
+    let time = Math.round(this.props.canvasTimeStart + x / this.props.canvasWidth * (this.props.canvasTimeEnd - this.props.canvasTimeStart))
+    time = Math.floor(time / dragSnap) * dragSnap
+    return time
+  }
+
   mountInteract () {
     console.log("NMount");
     interact(this.refs.hline)
@@ -32,21 +56,21 @@ export default class HorizontalLine extends Component {
       .dropzone({
         accept: '.draggable',
         ondrop: (event) => {
-          if (this.props.onDrop) {
-            this.props.onDrop(this.props.group)
-          }
+          let dropTime = this.dragTime(event.dragEvent)
+          this.props.onDrop(this.props.group, moment(dropTime))
           event.target.classList.remove('selected');
         },
         ondropmove: (event) => {
           event.target.classList.add("selected")
         },
         ondragleave: (event) => {
+          console.log("onDropLeave")
           event.target.classList.remove('selected');
         },
       })
       .on('tap', (e) => {
         this.actualClick(e, e.pointerType === 'mouse' ? 'click' : 'touch')
-      })
+      });
     this.setState(
       {
         interactMounted: true
@@ -58,13 +82,15 @@ export default class HorizontalLine extends Component {
     if (this.props.onContextMenu) {
       e.preventDefault()
       e.stopPropagation()
-      this.props.onContextMenu(this.group, e)
+      let dropTime = this.dragTime(e)
+      this.props.onContextMenu(this.group, moment(dropTime))
     }
   };
 
   actualClick (e, clickType) {
     if (this.props.canSelect && this.props.onSelect) {
-      this.props.onSelect(this.group, clickType, e)
+      let clickTime = this.dragTime(e)
+      this.props.onSelect(this.group, clickTime, clickType, e)
     }
   }
 
@@ -78,6 +104,7 @@ export default class HorizontalLine extends Component {
   onMouseUp = (e) => {
     if (!this.state.interactMounted && this.startedClicking) {
       this.startedClicking = false
+      console.log("Clicky uip")
       this.actualClick(e, 'click')
     }
   };
@@ -95,7 +122,6 @@ export default class HorizontalLine extends Component {
     }
   }
 
-
   render () {
     return (
       <div ref='hline'
@@ -111,6 +137,9 @@ export default class HorizontalLine extends Component {
 }
 
 HorizontalLine.propTypes = {
+  canvasTimeStart: React.PropTypes.number.isRequired,
+  canvasTimeEnd: React.PropTypes.number.isRequired,
+  canvasWidth: React.PropTypes.number.isRequired,
   group: React.PropTypes.object.isRequired,
   onSelect: React.PropTypes.func,
   onDrop: React.PropTypes.func,

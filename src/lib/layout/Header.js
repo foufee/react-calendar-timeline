@@ -146,6 +146,7 @@ export default class Header extends Component {
         const labelWidth = right - left
         const leftCorrect = fixedHeader === 'fixed' ? Math.round((canvasTimeStart - visibleTimeStart) * ratio) - 1 : 0
 
+
         timeLabels.push(
           <div key={`top-label-${time.valueOf()}`}
                href='#'
@@ -161,9 +162,14 @@ export default class Header extends Component {
                }}>
             {this.headerLabel(time, nextUnit, labelWidth)}
           </div>
-        )
+          )
       })
     }
+
+    const delta = timeSteps[minUnit]
+    let leftTime = moment(visibleTimeStart).startOf(minUnit)
+    let value = leftTime.get(minUnit)
+    leftTime.set(minUnit, value - (value % timeSteps[minUnit]))
 
     iterateTimes(canvasTimeStart, canvasTimeEnd, minUnit, timeSteps, (time, nextTime) => {
       const left = Math.round((time.valueOf() - canvasTimeStart) * ratio, -2)
@@ -173,24 +179,26 @@ export default class Header extends Component {
       const borderWidth = firstOfType ? 2 : 1
       const leftCorrect = fixedHeader === 'fixed' ? Math.round((canvasTimeStart - visibleTimeStart) * ratio) - borderWidth + 1 : 0
 
-      timeLabels.push(
-        <div key={`label-${time.valueOf()}`}
-             href='#'
-             className={`rct-label ${twoHeaders ? '' : 'rct-label-only'} ${firstOfType ? 'rct-first-of-type' : ''} `}
-             data-time={time}
-             data-unit={minUnit}
-             style={{
-               top: `${minUnit === 'year' ? 0 : headerLabelGroupHeight}px`,
-               left: `${left + leftCorrect}px`,
-               width: `${labelWidth}px`,
-               height: `${(minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight)}px`,
-               lineHeight: `${(minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight)}px`,
-               fontSize: `${(labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10')}px`,
-               cursor: 'pointer'
-             }}>
-          {this.subHeaderLabel(time, minUnit, labelWidth)}
-        </div>
-      )
+      if (time.valueOf() <= (visibleTimeEnd ) && time.valueOf() >= (leftTime) || true) {
+        timeLabels.push(
+          <div key={`label-${time.valueOf()}`}
+               href='#'
+               className={`rct-label ${twoHeaders ? '' : 'rct-label-only'} ${firstOfType ? 'rct-first-of-type' : ''} `}
+               data-time={time}
+               data-unit={minUnit}
+               style={{
+                 top: `${minUnit === 'year' ? 0 : headerLabelGroupHeight}px`,
+                 left: `${left + leftCorrect}px`,
+                 width: `${labelWidth}px`,
+                 height: `${(minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight)}px`,
+                 lineHeight: `${(minUnit === 'year' ? headerLabelGroupHeight + headerLabelHeight : headerLabelHeight)}px`,
+                 fontSize: `${(labelWidth > 30 ? '14' : labelWidth > 20 ? '12' : '10')}px`,
+                 cursor: 'pointer'
+               }}>
+            {this.subHeaderLabel(time, minUnit, labelWidth)}
+          </div>
+        )
+      }
     })
 
     const { zIndex } = this.props
