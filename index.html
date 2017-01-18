@@ -19,7 +19,8 @@
   <script src="build/dist/react-calendar-timeline.js"></script>
   <div class="container">
     <div class="left"> <i class="draggable fa fa-leaf"></i>  </div>
-    <div class="right"><div id="main"/>Hello</div>
+    <div class="middle"><div id="main"/>Hello</div></div>
+    <div class="right"> <i class="draggable fa fa-leaf"></i>  </div>
   </div>
 
   <style>
@@ -39,8 +40,14 @@
     }
 
     .right {
-      flex: 2;
+      flex: 1;
       background: purple;
+      z-index: 2;
+    }
+
+    .middle {
+      flex: 2;
+      background: red;
       z-index: 2;
     }
 

@@ -540,7 +540,7 @@ var ReactCalendarTimeline = function (_Component) {
 
       return _react2.default.createElement(
         'div',
-        { style: this.props.style, ref: 'container', className: 'react-calendar-timeline' },
+        { style: this.props.style, ref: 'container', className: 'react-calendar-timeline', onMouseLeave: this.handleMouseUp },
         _react2.default.createElement(
           'div',
           { style: outerComponentStyle, className: 'rct-outer' },
