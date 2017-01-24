@@ -303,7 +303,7 @@ export default class Item extends Component {
           }
 
           if (this.props.onResized && this.resizeTimeDelta(e, resizeEdge) !== 0) {
-            this.props.onResized(this.itemId, resizeTime, resizeEdge)
+            this.props.onResized(this.props.item, resizeTime, resizeEdge)
           }
           this.setState({
             resizing: null,
