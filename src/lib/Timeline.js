@@ -198,6 +198,7 @@ export default class ReactCalendarTimeline extends Component {
     }
 
     this.state = {
+      scrollBarWidthFudgeFactor: 48,
       width: 1000,
 
       visibleTimeStart: visibleTimeStart,
@@ -329,7 +330,7 @@ export default class ReactCalendarTimeline extends Component {
   resize () {
     // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
     const {width: containerWidth, top: containerTop} = this.refs.container.getBoundingClientRect()
-    let width = containerWidth - this.props.sidebarWidth
+    let width = containerWidth - this.props.sidebarWidth - this.state.scrollBarWidthFudgeFactor;
 
     const {
       dimensionItems, height, groupHeights, groupTops
@@ -341,7 +342,8 @@ export default class ReactCalendarTimeline extends Component {
       dimensionItems: dimensionItems,
       height: height,
       groupHeights: groupHeights,
-      groupTops: groupTops
+      groupTops: groupTops,
+      scrollBarWidthFudgeFactor: 0
     })
     this.refs.scrollComponent.scrollLeft = width
   }

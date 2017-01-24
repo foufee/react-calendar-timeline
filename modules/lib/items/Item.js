@@ -361,7 +361,7 @@ var Item = function (_Component) {
           }
 
           if (_this2.props.onResized && _this2.resizeTimeDelta(e, resizeEdge) !== 0) {
-            _this2.props.onResized(_this2.itemId, resizeTime, resizeEdge);
+            _this2.props.onResized(_this2.props.item, resizeTime, resizeEdge);
           }
           _this2.setState({
             resizing: null,

@@ -116,6 +116,7 @@ var ReactCalendarTimeline = function (_Component) {
     }
 
     _this.state = {
+      scrollBarWidthFudgeFactor: 48,
       width: 1000,
 
       visibleTimeStart: visibleTimeStart,
@@ -183,7 +184,7 @@ var ReactCalendarTimeline = function (_Component) {
           containerWidth = _refs$container$getBo.width,
           containerTop = _refs$container$getBo.top;
 
-      var width = containerWidth - this.props.sidebarWidth;
+      var width = containerWidth - this.props.sidebarWidth - this.state.scrollBarWidthFudgeFactor;
 
       var _stackItems = this.stackItems(this.props.items, this.props.groups, this.state.canvasTimeStart, this.state.visibleTimeStart, this.state.visibleTimeEnd, width),
           dimensionItems = _stackItems.dimensionItems,
@@ -197,7 +198,8 @@ var ReactCalendarTimeline = function (_Component) {
         dimensionItems: dimensionItems,
         height: height,
         groupHeights: groupHeights,
-        groupTops: groupTops
+        groupTops: groupTops,
+        scrollBarWidthFudgeFactor: 0
       });
       this.refs.scrollComponent.scrollLeft = width;
     }
