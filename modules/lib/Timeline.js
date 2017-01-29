@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1010,10 +1012,28 @@ var _initialiseProps = function _initialiseProps() {
     }
   };
 
-  this.moveResizeValidator = function (action, item, time, resizeEdge, newGroupId) {
+  this.moveResizeValidator = function (action, item, time, resizeEdge, newGroupIndex) {
     if (_this3.props.moveResizeValidator) {
-      var group = _this3.props.groups[newGroupId];
-      return _this3.props.moveResizeValidator(action, item, time, resizeEdge, group);
+      var _ret = function () {
+        // Convert to group (for external API), and back to index
+        var group = _this3.props.groups[newGroupIndex];
+
+        var _props$moveResizeVali = _this3.props.moveResizeValidator(action, item, time, resizeEdge, group),
+            newDragTime = _props$moveResizeVali.newDragTime,
+            newGroup = _props$moveResizeVali.newGroup;
+
+        var updatedGroupIndex = _this3.props.groups.findIndex(function (group) {
+          return group.id === newGroup;
+        });
+        return {
+          v: {
+            newDragTime: newDragTime,
+            newGroup: updatedGroupIndex
+          }
+        };
+      }();
+
+      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
     }
   };
 
