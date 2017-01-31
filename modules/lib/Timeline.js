@@ -181,7 +181,9 @@ var ReactCalendarTimeline = function (_Component) {
   }, {
     key: 'resize',
     value: function resize() {
+      console.log("Resizing goodness");
       // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
+
       var _refs$container$getBo = this.refs.container.getBoundingClientRect(),
           containerWidth = _refs$container$getBo.width,
           containerTop = _refs$container$getBo.top;
