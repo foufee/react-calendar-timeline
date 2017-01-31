@@ -99,6 +99,9 @@ export default class ReactCalendarTimeline extends Component {
     onTimeInit: PropTypes.func,
     onBoundsChange: PropTypes.func,
 
+    itemRenderer: PropTypes.func,
+    titleRenderer: PropTypes.func,
+
     children: PropTypes.node
   }
 
@@ -328,6 +331,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   resize () {
+    console.log("Resizing goodness")
     // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
     const {width: containerWidth, top: containerTop} = this.refs.container.getBoundingClientRect()
     let width = containerWidth - this.props.sidebarWidth - this.state.scrollBarWidthFudgeFactor;
@@ -615,11 +619,17 @@ export default class ReactCalendarTimeline extends Component {
     if (this.props.moveResizeValidator) {
       // Convert to group (for external API), and back to index
       let group = this.props.groups[newGroupIndex];
-      let {newDragTime,newGroup} = this.props.moveResizeValidator(action, item, time, resizeEdge, group)
-      let updatedGroupIndex = this.props.groups.findIndex( (group) => { return group.id === newGroup})
-      return {
-        newDragTime: newDragTime,
-        newGroup: updatedGroupIndex
+      if (action === 'resize') {
+        return this.props.moveResizeValidator(action, item, time, resizeEdge, group)
+      } else {
+        let {newDragTime, newGroup} = this.props.moveResizeValidator(action, item, time, resizeEdge, group)
+        let updatedGroupIndex = this.props.groups.findIndex((group) => {
+          return group.id === newGroup
+        })
+        return {
+          newDragTime: newDragTime,
+          newGroup: updatedGroupIndex
+        }
       }
     }
   }
@@ -747,7 +757,9 @@ export default class ReactCalendarTimeline extends Component {
              onItemContextMenu={this.props.onItemContextMenu}
              onItemDrop={this.props.onItemDrop}
              itemResizing={this.resizingItem}
-             itemResized={this.resizedItem} />
+             itemResized={this.resizedItem}
+             titleRenderer={this.props.titleRenderer}
+             itemRenderer={this.props.itemRenderer} />
     )
   }
 

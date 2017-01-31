@@ -369,7 +369,9 @@ var ReactCalendarTimeline = function (_Component) {
         onItemContextMenu: this.props.onItemContextMenu,
         onItemDrop: this.props.onItemDrop,
         itemResizing: this.resizingItem,
-        itemResized: this.resizedItem });
+        itemResized: this.resizedItem,
+        titleRenderer: this.props.titleRenderer,
+        itemRenderer: this.props.itemRenderer });
     }
   }, {
     key: 'infoLabel',
@@ -648,6 +650,9 @@ ReactCalendarTimeline.propTypes = {
   onTimeChange: _react.PropTypes.func,
   onTimeInit: _react.PropTypes.func,
   onBoundsChange: _react.PropTypes.func,
+
+  itemRenderer: _react.PropTypes.func,
+  titleRenderer: _react.PropTypes.func,
 
   children: _react.PropTypes.node
 };
@@ -1014,26 +1019,29 @@ var _initialiseProps = function _initialiseProps() {
 
   this.moveResizeValidator = function (action, item, time, resizeEdge, newGroupIndex) {
     if (_this3.props.moveResizeValidator) {
-      var _ret = function () {
-        // Convert to group (for external API), and back to index
-        var group = _this3.props.groups[newGroupIndex];
+      // Convert to group (for external API), and back to index
+      var group = _this3.props.groups[newGroupIndex];
+      if (action === 'resize') {
+        return _this3.props.moveResizeValidator(action, item, time, resizeEdge, group);
+      } else {
+        var _ret = function () {
+          var _props$moveResizeVali = _this3.props.moveResizeValidator(action, item, time, resizeEdge, group),
+              newDragTime = _props$moveResizeVali.newDragTime,
+              newGroup = _props$moveResizeVali.newGroup;
 
-        var _props$moveResizeVali = _this3.props.moveResizeValidator(action, item, time, resizeEdge, group),
-            newDragTime = _props$moveResizeVali.newDragTime,
-            newGroup = _props$moveResizeVali.newGroup;
+          var updatedGroupIndex = _this3.props.groups.findIndex(function (group) {
+            return group.id === newGroup;
+          });
+          return {
+            v: {
+              newDragTime: newDragTime,
+              newGroup: updatedGroupIndex
+            }
+          };
+        }();
 
-        var updatedGroupIndex = _this3.props.groups.findIndex(function (group) {
-          return group.id === newGroup;
-        });
-        return {
-          v: {
-            newDragTime: newDragTime,
-            newGroup: updatedGroupIndex
-          }
-        };
-      }();
-
-      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      }
     }
   };
 

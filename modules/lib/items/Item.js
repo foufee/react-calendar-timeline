@@ -177,7 +177,6 @@ var Item = function (_Component) {
           return 0;
         }
         var groupDelta = 0;
-
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;
@@ -486,7 +485,7 @@ var Item = function (_Component) {
         return null;
       }
 
-      var classNames = 'rct-item' + (this.props.selected ? ' selected' : '') + (this.canMove(this.props) ? ' can-move' : '') + (this.canResizeLeft(this.props) || this.canResizeRight(this.props) ? ' can-resize' : '') + (this.canResizeLeft(this.props) ? ' can-resize-left' : '') + (this.canResizeRight(this.props) ? ' can-resize-right' : '') + (this.props.item.className ? ' ' + this.props.item.className : '') + (dimensions.clippedLeft ? ' clipped-left' : '') + (dimensions.clippedRight ? ' clipped-right' : '');
+      var classNames = 'rct-item' + (this.props.selected ? ' selected' : '') + (this.canMove(this.props) ? ' can-move' : '') + (this.canResizeLeft(this.props) || this.canResizeRight(this.props) ? ' can-resize' : '') + (this.canResizeLeft(this.props) || true ? ' can-resize-left' : '') + (this.canResizeRight(this.props) || true ? ' can-resize-right' : '') + (this.props.item.className ? ' ' + this.props.item.className : '') + (dimensions.clippedLeft ? ' clipped-left' : '') + (dimensions.clippedRight ? ' clipped-right' : '');
 
       var style = {
         left: dimensions.left + 'px',
@@ -495,6 +494,13 @@ var Item = function (_Component) {
         height: dimensions.height + 'px',
         lineHeight: dimensions.height + 'px'
       };
+
+      var title = this.props.titleRenderer ? this.props.titleRenderer(this.props.item) : this.itemTitle;
+      var block = this.props.itemRenderer ? this.props.itemRenderer(this.props.item, "rct-item-content", title) : _react2.default.createElement(
+        'div',
+        { className: 'rct-item-content' },
+        title
+      );
 
       return _react2.default.createElement(
         'div',
@@ -514,11 +520,7 @@ var Item = function (_Component) {
         _react2.default.createElement(
           'div',
           { className: 'rct-item-overflow' },
-          _react2.default.createElement(
-            'div',
-            { className: 'rct-item-content' },
-            this.itemTitle
-          )
+          block
         ),
         this.props.useResizeHandle ? _react2.default.createElement('div', { ref: 'dragRight', className: 'rct-drag-right' }) : ''
       );

@@ -140,7 +140,6 @@ export default class Item extends Component {
         return 0
       }
       let groupDelta = 0
-
       for (var key of Object.keys(groupTops)) {
         var item = groupTops[key]
         if (e.pageY - topOffset > item) {
@@ -480,6 +479,9 @@ export default class Item extends Component {
     }
     console.log(style)
 
+    let title = this.props.titleRenderer ? this.props.titleRenderer(this.props.item) : this.itemTitle
+    let block = this.props.itemRenderer ? this.props.itemRenderer(this.props.item,"rct-item-content",title) : <div className="rct-item-content">{title}</div>
+
     return (
       <div {...this.props.item.itemProps}
            key={this.itemId}
@@ -493,12 +495,11 @@ export default class Item extends Component {
            onDoubleClick={this.handleDoubleClick}
            onContextMenu={this.handleContextMenu}
            style={style}>
-        {this.props.useResizeHandle ? <div ref='dragLeft' className='rct-drag-left'></div> : ''}
+
         <div className='rct-item-overflow'>
-          <div className='rct-item-content'>
-            {this.itemTitle}
-          </div>
+          {block}
         </div>
+        {this.props.useResizeHandle ? <div ref='dragLeft' className='rct-drag-left'></div> : ''}
         {this.props.useResizeHandle ? <div ref='dragRight' className='rct-drag-right'></div> : ''}
       </div>
     )
