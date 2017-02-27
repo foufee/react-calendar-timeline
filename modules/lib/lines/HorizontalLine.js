@@ -132,7 +132,6 @@ var HorizontalLine = function (_Component) {
     value: function mountInteract() {
       var _this2 = this;
 
-      console.log("NMount");
       (0, _interact2.default)(this.refs.hline).draggable(false).resizable(false).gesturable(false).dropzone({
         accept: '.draggable',
         ondrop: function ondrop(event) {

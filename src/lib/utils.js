@@ -104,9 +104,6 @@ export function calculateDimensions ({ item, order, keys, canvasTimeStart, canva
   let x = isDragging ? dragTime : itemStart
 
   let w = Math.max(itemEnd - itemStart, dragSnap)
-  console.log(itemEnd);
-  console.log(itemStart)
-  console.log(w);
   let collisionX = itemStart
   let collisionW = w
 

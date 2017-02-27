@@ -48,7 +48,6 @@ export default class HorizontalLine extends Component {
   }
 
   mountInteract () {
-    console.log("NMount");
     interact(this.refs.hline)
       .draggable(false)
       .resizable(false)
