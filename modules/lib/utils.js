@@ -155,7 +155,9 @@ function calculateDimensions(_ref) {
   var x = isDragging ? dragTime : itemStart;
 
   var w = Math.max(itemEnd - itemStart, dragSnap);
-
+  console.log(itemEnd);
+  console.log(itemStart);
+  console.log(w);
   var collisionX = itemStart;
   var collisionW = w;
 

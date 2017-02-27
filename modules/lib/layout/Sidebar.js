@@ -110,6 +110,8 @@ var Sidebar = function (_Component) {
       var _props$keys = this.props.keys,
           groupIdKey = _props$keys.groupIdKey,
           groupTitleKey = _props$keys.groupTitleKey;
+
+      var groups = this.props.groups;
       var scrollTop = this.state.scrollTop;
 
 

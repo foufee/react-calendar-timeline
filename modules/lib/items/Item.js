@@ -124,6 +124,7 @@ var Item = function (_Component) {
     value: function coordinateToTimeRatio() {
       var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
 
+      console.log(props);
       return (props.canvasTimeEnd - props.canvasTimeStart) / props.canvasWidth;
     }
   }, {
@@ -242,6 +243,9 @@ var Item = function (_Component) {
 
       var leftResize = this.props.useResizeHandle ? this.refs.dragLeft : true;
       var rightResize = this.props.useResizeHandle ? this.refs.dragRight : true;
+
+      console.log("Here");
+      console.log((0, _interact2.default)(this.refs.item));
 
       (0, _interact2.default)(this.refs.item).resizable({
         edges: {
@@ -494,6 +498,7 @@ var Item = function (_Component) {
         height: dimensions.height + 'px',
         lineHeight: dimensions.height + 'px'
       };
+      console.log(style);
 
       var title = this.props.titleRenderer ? this.props.titleRenderer(this.props.item) : this.itemTitle;
       var block = this.props.itemRenderer ? this.props.itemRenderer(this.props.item, "rct-item-content", title) : _react2.default.createElement(
