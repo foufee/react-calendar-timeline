@@ -512,6 +512,14 @@ export default class ReactCalendarTimeline extends Component {
     this.props.onTimeChange.bind(this)(newVisibleTimeStart, newVisibleTimeStart + newZoom, this.updateScrollCanvas)
   }
 
+  showNow() {
+    const halfDelta = (this.state.visibleTimeEnd - this.state.visibleTimeStart) / 2.0
+    let centerTime = moment().valueOf()
+    let visibleTimeStart = centerTime - halfDelta
+    let visibleTimeEnd = centerTime + halfDelta
+    this.props.onTimeChange.bind(this)(visibleTimeStart, visibleTimeEnd, this.updateScrollCanvas)
+  }
+
   showPeriod = (from, unit) => {
     let visibleTimeStart = from.valueOf()
     let visibleTimeEnd = moment(from).add(1, unit).valueOf()
