@@ -3,7 +3,8 @@ import React, { Component } from 'react'
 export default class TodayLine extends Component {
   // TODO: should currentTime come from a prop? probably...?
   render () {
-    let currentTime = new Date().getTime()
+
+    let currentTime = this.props.currentTime;
 
     if (currentTime > this.props.canvasTimeStart && currentTime < this.props.canvasTimeEnd) {
       const ratio = this.props.canvasWidth / (this.props.canvasTimeEnd - this.props.canvasTimeStart)
@@ -23,6 +24,7 @@ export default class TodayLine extends Component {
   }
 }
 TodayLine.propTypes = {
+  currentTime: React.PropTypes.number.isRequired,
   canvasTimeStart: React.PropTypes.number.isRequired,
   canvasTimeEnd: React.PropTypes.number.isRequired,
   canvasWidth: React.PropTypes.number.isRequired,

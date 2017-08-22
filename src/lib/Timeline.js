@@ -59,6 +59,8 @@ export default class ReactCalendarTimeline extends Component {
     canSelect: PropTypes.bool,
     canSelectGroups: PropTypes.bool,
 
+    currentTime: PropTypes.number,
+
     stackItems: PropTypes.bool,
 
     traditionalZoom: PropTypes.bool,
@@ -119,6 +121,8 @@ export default class ReactCalendarTimeline extends Component {
 
     minZoom: 60 * 60 * 1000, // 1 hour
     maxZoom: 5 * 365.24 * 86400 * 1000, // 5 years
+
+    currentTime: 0,
 
     clickTolerance: 3, // how many pixels can we drag for it to be still considered a click?
 
@@ -331,7 +335,6 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   resize () {
-    console.log("Resizing goodness")
     // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
     const {width: containerWidth, top: containerTop} = this.refs.container.getBoundingClientRect()
     let width = containerWidth - this.props.sidebarWidth - this.state.scrollBarWidthFudgeFactor;
@@ -685,9 +688,10 @@ export default class ReactCalendarTimeline extends Component {
     this.setState({isDragging: false, dragStartPosition: null, dragLastPosition: null})
   }
 
-  todayLine (canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight) {
+  todayLine (canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight, currentTime) {
     return (
-      <TodayLine canvasTimeStart={canvasTimeStart}
+      <TodayLine currentTime={currentTime}
+                 canvasTimeStart={canvasTimeStart}
                  canvasTimeEnd={canvasTimeEnd}
                  canvasWidth={canvasWidth}
                  lineHeight={this.props.lineHeight}
@@ -900,7 +904,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   render () {
-    const { items, groups, headerLabelGroupHeight, headerLabelHeight, sidebarWidth, timeSteps, dragSnap } = this.props
+    const { items, groups, headerLabelGroupHeight, headerLabelHeight, sidebarWidth, timeSteps, dragSnap, currentTime } = this.props
     const { draggingItem, resizingItem, isDragging, width, visibleTimeStart, visibleTimeEnd, canvasTimeStart } = this.state
     let { dimensionItems, height, groupHeights, groupTops } = this.state
     const zoom = visibleTimeEnd - visibleTimeStart
@@ -952,7 +956,7 @@ export default class ReactCalendarTimeline extends Component {
             >
               {this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight)}
               {this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap)}
-              {this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight)}
+              {this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight, this.props.currentTime)}
               {this.infoLabel()}
               {this.header(
                 canvasTimeStart,

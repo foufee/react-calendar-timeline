@@ -347,10 +347,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'showNow',
 	    value: function showNow() {
-	      var centerTime = (0, _moment2.default)();
-	      var visibleTimeStart = centerTime.subtract(0.5, unit).valueOf();
-	      var visibleTimeEnd = (0, _moment2.default)(from).add(0.5, unit).valueOf();
-	      this.props.onTimeChange.bind(this)(visibleTimeStart, visibleTimeStart, this.updateScrollCanvas);
+	      var halfDelta = (this.state.visibleTimeEnd - this.state.visibleTimeStart) / 2.0;
+	      var centerTime = (0, _moment2.default)().valueOf();
+	      var visibleTimeStart = centerTime - halfDelta;
+	      var visibleTimeEnd = centerTime + halfDelta;
+	      this.props.onTimeChange.bind(this)(visibleTimeStart, visibleTimeEnd, this.updateScrollCanvas);
 	    }
 	  }, {
 	    key: 'rowAndTimeFromEvent',
@@ -376,7 +377,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'todayLine',
 	    value: function todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight) {
-	      return _react2.default.createElement(_TodayLine2.default, { canvasTimeStart: canvasTimeStart,
+	      return _react2.default.createElement(_TodayLine2.default, { currentTime: new Date().getTime(),
+	        canvasTimeStart: canvasTimeStart,
 	        canvasTimeEnd: canvasTimeEnd,
 	        canvasWidth: canvasWidth,
 	        lineHeight: this.props.lineHeight,
@@ -3794,7 +3796,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // TODO: should currentTime come from a prop? probably...?
 	    value: function render() {
-	      var currentTime = new Date().getTime();
+	      var currentTime = this.props.currentTime;
 	
 	      if (currentTime > this.props.canvasTimeStart && currentTime < this.props.canvasTimeEnd) {
 	        var ratio = this.props.canvasWidth / (this.props.canvasTimeEnd - this.props.canvasTimeStart);
@@ -3820,6 +3822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = TodayLine;
 	
 	TodayLine.propTypes = {
+	  currentTime: _react2.default.PropTypes.number.isRequired,
 	  canvasTimeStart: _react2.default.PropTypes.number.isRequired,
 	  canvasTimeEnd: _react2.default.PropTypes.number.isRequired,
 	  canvasWidth: _react2.default.PropTypes.number.isRequired,

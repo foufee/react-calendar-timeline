@@ -179,9 +179,7 @@ var ReactCalendarTimeline = function (_Component) {
   }, {
     key: 'resize',
     value: function resize() {
-      console.log("Resizing goodness");
       // FIXME currently when the component creates a scroll the scrollbar is not used in the initial width calculation, resizing fixes this
-
       var _refs$container$getBo = this.refs.container.getBoundingClientRect(),
           containerWidth = _refs$container$getBo.width,
           containerTop = _refs$container$getBo.top;
@@ -302,8 +300,9 @@ var ReactCalendarTimeline = function (_Component) {
     }
   }, {
     key: 'todayLine',
-    value: function todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight) {
-      return _react2.default.createElement(_TodayLine2.default, { canvasTimeStart: canvasTimeStart,
+    value: function todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight, currentTime) {
+      return _react2.default.createElement(_TodayLine2.default, { currentTime: currentTime,
+        canvasTimeStart: canvasTimeStart,
         canvasTimeEnd: canvasTimeEnd,
         canvasWidth: canvasWidth,
         lineHeight: this.props.lineHeight,
@@ -509,7 +508,8 @@ var ReactCalendarTimeline = function (_Component) {
           headerLabelHeight = _props4.headerLabelHeight,
           sidebarWidth = _props4.sidebarWidth,
           timeSteps = _props4.timeSteps,
-          dragSnap = _props4.dragSnap;
+          dragSnap = _props4.dragSnap,
+          currentTime = _props4.currentTime;
       var _state4 = this.state,
           draggingItem = _state4.draggingItem,
           resizingItem = _state4.resizingItem,
@@ -580,7 +580,7 @@ var ReactCalendarTimeline = function (_Component) {
               },
               this.verticalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, height, headerHeight),
               this.horizontalLines(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, groupHeights, headerHeight, dragSnap),
-              this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight),
+              this.todayLine(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, height, headerHeight, this.props.currentTime),
               this.infoLabel(),
               this.header(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, timeSteps, headerLabelGroupHeight, headerLabelHeight),
               this.items(canvasTimeStart, zoom, canvasTimeEnd, canvasWidth, minUnit, dimensionItems, groupHeights, groupTops)
@@ -619,6 +619,8 @@ ReactCalendarTimeline.propTypes = {
   useResizeHandle: _react.PropTypes.bool,
   canSelect: _react.PropTypes.bool,
   canSelectGroups: _react.PropTypes.bool,
+
+  currentTime: _react.PropTypes.number,
 
   stackItems: _react.PropTypes.bool,
 
@@ -679,6 +681,8 @@ ReactCalendarTimeline.defaultProps = {
 
   minZoom: 60 * 60 * 1000, // 1 hour
   maxZoom: 5 * 365.24 * 86400 * 1000, // 5 years
+
+  currentTime: 0,
 
   clickTolerance: 3, // how many pixels can we drag for it to be still considered a click?
 
